@@ -56,7 +56,14 @@ const register_validator = [
     .notEmpty()
     .withMessage('La ville est requise')
     .isIn(['Marseille', 'Paris', 'Lyon', 'Bordeaux', 'Toulouse'])
-    .withMessage('Ville invalide. Villes acceptées: Marseille, Paris, Lyon, Bordeaux, Toulouse')
+    .withMessage('Ville invalide. Villes acceptées: Marseille, Paris, Lyon, Bordeaux, Toulouse'),
+  
+  body('promo')
+    .trim()
+    .notEmpty()
+    .withMessage('La promotion est requise')
+    .isLength({ min: 2, max: 100 })
+    .withMessage('La promotion doit contenir entre 2 et 100 caractères')
 ];
 
 /**

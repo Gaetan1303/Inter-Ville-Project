@@ -11,7 +11,7 @@ const { send_welcome_email } = require('../services/email_service');
  */
 const register = async (req, res) => {
   try {
-    const { email, password, first_name, last_name, city } = req.body;
+    const { email, password, first_name, last_name, city, promo } = req.body;
 
     // Vérifier si un utilisateur avec cet email existe déjà
     const existing_user = await User.findOne({ where: { email } });
@@ -30,6 +30,7 @@ const register = async (req, res) => {
       first_name,
       last_name,
       city,
+      promo,
       is_validated: false,  // Le compte nécessite une validation admin
       role: 'user'          // Rôle par défaut
     });
@@ -50,6 +51,7 @@ const register = async (req, res) => {
           first_name: user.first_name,
           last_name: user.last_name,
           city: user.city,
+          promo: user.promo,
           is_validated: user.is_validated,
           role: user.role
         }

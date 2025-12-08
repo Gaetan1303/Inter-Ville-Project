@@ -49,6 +49,11 @@ const User = sequelize.define('User', {
     allowNull: false,
     comment: 'Ville du campus La Plateforme_'
   },
+  promo: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+    comment: 'Promotion de l\'étudiant (ex: AI1, Dev2, etc.)'
+  },
   avatar: {
     type: DataTypes.STRING(255),
     allowNull: true,
