@@ -33,13 +33,6 @@
 - Socket.IO Client (WebSocket)
 - CSS3 (Styling)
 
-**DevOps:**
-- Docker + Docker Compose
-- MySQL (Conteneurisé)
-- phpMyAdmin (Gestion BDD)
-- Mailhog (Test emails)
-
----
 
 ##  Structure du Projet
 
@@ -224,9 +217,7 @@ backend/
 │
 ├── package.json
 ├── .env
-├── .env.example
 ├── .gitignore
-├── Dockerfile
 ├── .dockerignore
 └── README.md
 ```
@@ -247,12 +238,12 @@ backend/
 - role (user/admin)
 - isValidated (boolean)
 - timestamps
+- promo : string 
 
 **challenges**
 - id (PK)
 - title
 - description
-- city
 - category
 - difficulty (easy/medium/hard)
 - status (active/completed/cancelled)
@@ -266,7 +257,6 @@ backend/
 - userId (FK → users)
 - challengeId (FK → challenges)
 - status (registered/in_progress/completed/abandoned)
-- submissionUrl
 - score
 - timestamps
 
@@ -465,9 +455,6 @@ socket.on('user:disconnected', (userId) => { ... });
 # Cloner le dépôt
 git clone https://github.com/Gaetan1303/Inter-Ville-Project.git
 cd Inter-Ville-Project
-
-# Démarrer les services
-docker compose up -d
 
 # Backend
 cd backend

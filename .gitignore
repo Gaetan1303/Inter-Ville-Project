@@ -1,0 +1,10 @@
+# Ignorer les fichiers et dossiers sensibles ou spécifiques
+
+# Fichiers d'environnement
+.env
+
+# Répertoire des tests
+backend/test/
+
+# Configuration Jest
+backend/jest.config.js

@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, logout, get_me } = require('../controllers/auth_controller');
-const { register_validator, login_validator } = require('../validators/auth_validator');
-const validate = require('../middlewares/validation_middleware');
+const { register, login, logout, get_me, refresh_token, validate_user } = require('../controllers/auth_controller');
+const authenticate = require('../middlewares/auth_middleware');
 
 /**
  * Routes d'authentification
@@ -10,11 +9,11 @@ const validate = require('../middlewares/validation_middleware');
 
 // Route d'inscription - accessible à tous
 // POST /auth/register
-router.post('/register', register_validator, validate, register);
+router.post('/register', register);
 
-// Route de connexion - accessible à tous (à implémenter)
+// Route de connexion - accessible à tous
 // POST /auth/login
-router.post('/login', login_validator, validate, login);
+router.post('/login', login);
 
 // Route de déconnexion - nécessite authentification (à implémenter)
 // POST /auth/logout
@@ -23,5 +22,13 @@ router.post('/logout', logout);
 // Route pour obtenir l'utilisateur connecté - nécessite authentification (à implémenter)
 // GET /auth/moi
 router.get('/profil', get_me);
+
+// Route pour rafraîchir les tokens - accessible à tous
+// POST /auth/refresh-token
+router.post('/refresh-token', refresh_token);
+
+// Route pour valider un utilisateur - nécessite authentification admin
+// POST /auth/validate-user
+router.post('/validate-user', authenticate, validate_user);
 
 module.exports = router;

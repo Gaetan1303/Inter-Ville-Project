@@ -1,5 +1,6 @@
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
-const { generate_token, generate_refresh_token } = require('../services/token_service');
+const { generate_token, generate_refresh_token, verify_token } = require('../services/token_service');
 const { send_welcome_email } = require('../services/email_service');
 
 /**
@@ -13,9 +14,32 @@ const register = async (req, res) => {
   try {
     const { email, password, first_name, last_name, city, promo } = req.body;
 
+    // Validation des champs requis
+    if (!email || !password || !first_name || !last_name || !city || !promo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tous les champs sont requis',
+      });
+    }
+
+    // Validation du format de l'email
+    if (!email.endsWith('@laplateforme.io')) {
+      return res.status(400).json({
+        success: false,
+        message: "Format d'email invalide",
+      });
+    }
+
+    // Validation de la longueur du mot de passe
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'Le mot de passe doit contenir au moins 8 caractères',
+      });
+    }
+
     // Vérifier si un utilisateur avec cet email existe déjà
     const existing_user = await User.findOne({ where: { email } });
-    
     if (existing_user) {
       return res.status(400).json({
         success: false,
@@ -57,19 +81,14 @@ const register = async (req, res) => {
         }
       }
     });
-
   } catch (error) {
     console.error('Erreur lors de l\'inscription:', error);
-    
+
     // Gestion des erreurs de validation Sequelize
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({
         success: false,
-        message: 'Erreur de validation des données',
-        errors: error.errors.map(err => ({
-          field: err.path,
-          message: err.message
-        }))
+        message: error.errors[0]?.message || 'Erreur de validation des données',
       });
     }
 
@@ -91,17 +110,58 @@ const register = async (req, res) => {
 };
 
 /**
- * Connexion d'un utilisateur (à implémenter plus tard)
+ * Connexion d'un utilisateur
  * @route POST /api/auth/login
  * @param {Object} req - Objet de requête Express
  * @param {Object} res - Objet de réponse Express
  * @returns {Object} Réponse JSON
  */
 const login = async (req, res) => {
-  res.status(501).json({
-    success: false,
-    message: 'Fonctionnalité de connexion pas encore implémentée'
-  });
+  try {
+    const { email, password } = req.body;
+
+    // Validation des champs requis
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email et mot de passe sont requis',
+      });
+    }
+
+    // Vérifier si l'utilisateur existe
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect' });
+    }
+
+    // Vérifier le mot de passe
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect' });
+    }
+
+    // Vérifier si l'utilisateur est validé par un admin
+    if (!user.is_validated) {
+      return res.status(403).json({ success: false, message: 'Votre compte doit être validé par un administrateur' });
+    }
+
+    // Générer les tokens
+    const accessToken = generate_token(user.id);
+    const refreshToken = generate_refresh_token(user.id);
+
+    // Répondre avec les tokens
+    return res.status(200).json({
+      success: true,
+      message: 'Connexion réussie',
+      data: {
+        accessToken,
+        refreshToken
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors de la connexion:', error);
+    return res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+  }
 };
 
 /**
@@ -132,9 +192,80 @@ const get_me = async (req, res) => {
   });
 };
 
+/**
+ * Rafraîchir le token d'accès
+ * @route POST /api/auth/refresh-token
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} res - Objet de réponse Express
+ * @returns {Object} Réponse JSON
+ */
+const refresh_token = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    // Vérifier si le refresh token est valide
+    const decoded = verify_token(refreshToken);
+    if (!decoded) {
+      return res.status(401).json({ success: false, message: 'Refresh token invalide ou expiré' });
+    }
+
+    // Générer un nouveau token d'accès
+    const newAccessToken = generate_token(decoded.id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Token rafraîchi avec succès',
+      data: {
+        accessToken: newAccessToken
+      }
+    });
+  } catch (error) {
+    console.error('Erreur lors du rafraîchissement du token:', error);
+    return res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+  }
+};
+
+/**
+ * Validation d'un utilisateur par un administrateur
+ * @route POST /api/auth/validate-user
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} res - Objet de réponse Express
+ * @returns {Object} Réponse JSON
+ */
+const validate_user = async (req, res) => {
+  try {
+    const { userId } = req.body;
+
+    // Vérifier si l'utilisateur est un admin
+    const adminUser = await User.findByPk(req.user?.id); // Ajout de l'opérateur optionnel pour éviter les erreurs
+    if (!adminUser || adminUser.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Accès refusé : droits insuffisants' });
+    }
+
+    // Valider l'utilisateur
+    const userToValidate = await User.findByPk(userId);
+    if (!userToValidate) {
+      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+    }
+
+    userToValidate.is_validated = true;
+    await userToValidate.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Utilisateur validé avec succès'
+    });
+  } catch (error) {
+    console.error('Erreur lors de la validation de l\'utilisateur:', error);
+    return res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
-  get_me
+  get_me,
+  refresh_token,
+  validate_user
 };
