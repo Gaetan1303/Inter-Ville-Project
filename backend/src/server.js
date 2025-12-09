@@ -1,5 +1,8 @@
+const http = require('http');
+const { Server } = require('socket.io');
 const app = require('./app');
 const { sequelize, test_connection } = require('./config/database');
+const { initializeSocketHandlers } = require('./socket/socketHandler');
 require('dotenv').config();
 
 /**
@@ -8,10 +11,27 @@ require('dotenv').config();
 const PORT = process.env.PORT || 5000;
 
 /**
+ * Configuration Socket.IO
+ */
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+/**
+ * Initialisation des gestionnaires WebSocket
+ */
+initializeSocketHandlers(io);
+
+/**
  * Démarrage du serveur
  * 1. Teste la connexion à la base de données
  * 2. Synchronise les modèles avec la base de données
- * 3. Démarre le serveur Express
+ * 3. Démarre le serveur HTTP avec Socket.IO
  */
 const start_server = async () => {
   try {
@@ -23,8 +43,8 @@ const start_server = async () => {
     await sequelize.sync({ alter: true });
     console.log(' Modèles synchronisés avec la base de données');
     
-    // Démarrer le serveur Express
-    app.listen(PORT, () => {
+    // Démarrer le serveur HTTP avec Socket.IO
+    server.listen(PORT, () => {
       console.log('');
       console.log(' ================================');
       console.log(` Serveur CDPI Network démarré`);
@@ -32,6 +52,7 @@ const start_server = async () => {
       console.log(` Port: ${PORT}`);
       console.log(` URL: http://localhost:${PORT}`);
       console.log(` API: http://localhost:${PORT}/`);
+      console.log(` WebSocket: Socket.IO activé`);
       console.log(' ================================');
       console.log('');
     });
@@ -59,3 +80,6 @@ process.on('SIGINT', async () => {
 
 // Démarrer le serveur
 start_server();
+
+// Exporter l'instance Socket.IO
+module.exports.io = io;
