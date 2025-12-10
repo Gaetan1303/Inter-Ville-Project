@@ -10,7 +10,8 @@ export default function Profile() {
         <h2>
           {user.firstName} {user.lastName}
         </h2>
-        <p>Pseudo: king</p>
+        <p>Nom: Lucie</p>
+        <p>Prenom: Dupont</p>
         <p>Ville: Marseille</p>
         <p>Promo: Einstein</p>
         <p>Validé: En attente</p>
