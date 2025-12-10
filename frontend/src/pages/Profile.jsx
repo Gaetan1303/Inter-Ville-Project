@@ -12,7 +12,7 @@ export default function Profile() {
         </h2>
         <p>Pseudo: king</p>
         <p>Ville: Marseille</p>
-        <p>Promo: gibralar</p>
+        <p>Promo: Einstein</p>
         <p>Validé: En attente</p>
         <button>Se déconnecter</button>
       </div>
