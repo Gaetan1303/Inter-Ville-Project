@@ -27,7 +27,7 @@ const header = () => {
           <Link to="/challenges" onClick={closeMenu}>
             Défis
           </Link>
-          <Link to="/Créer" onClick={closeMenu}>
+          <Link to="/create" onClick={closeMenu}>
             Créer
           </Link>
           <Link to="/profile" onClick={closeMenu}>

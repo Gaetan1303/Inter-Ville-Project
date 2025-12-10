@@ -7,11 +7,7 @@ export default function Profile() {
   return (
     <div className="container">
       <div className="card">
-        <h2>
-          {user.firstName} {user.lastName}
-        </h2>
-        <p>Nom: Lucie</p>
-        <p>Prenom: Dupont</p>
+        <h2>Lucie Dupont</h2>
         <p>Ville: Marseille</p>
         <p>Promo: Einstein</p>
         <p>Validé: En attente</p>
