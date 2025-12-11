@@ -4,7 +4,8 @@ import { useChallenges } from '../contexts/ChallengeContext';
 
 export default function Home() {
   const { challenges } = useChallenges();
-  const total = challenges?.length || 5;
+  const challengeActive = challenges?.filter((c) => c.status === 'active');
+  const total = challengeActive?.length || 5;
 
   return (
     <div className="container">
