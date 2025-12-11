@@ -1,11 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useChallenges } from '../contexts/ChallengeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const { challenges } = useChallenges();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
   const challengeActive = challenges?.filter((c) => c.status === 'active');
   const total = challengeActive?.length || 5;
+  const disabled = !user;
 
   return (
     <div className="container">
@@ -21,9 +27,20 @@ export default function Home() {
             <Link to="/Challenges">
               <button>Explorer les défis</button>
             </Link>
-            <Link to="/create">
-              <button className="ghost-btn">Créer un challenge</button>
-            </Link>
+            <button
+              onClick={() => {
+                if (disabled) {
+                  navigate('/');
+                  alert('vous devez vous connecter pour creer un challenge');
+                  return;
+                } else {
+                  navigate('/create');
+                }
+              }}
+              className="ghost-btn"
+            >
+              Créer un challenge
+            </button>
           </div>
           <div className="badges">
             <span className="pill">Suivi des participations</span>
