@@ -16,7 +16,9 @@ const authenticate = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
+    console.log('Token:', token); // Ajout de journaux pour déboguer les valeurs du jeton
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('Contenu décodé du token:', decoded); // Ajout de journaux pour vérifier le contenu du token
 
     const user = await User.findByPk(decoded.id);
     if (!user) {
@@ -27,6 +29,18 @@ const authenticate = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Erreur d\'authentification:', error);
+
+    // Ajout de journaux pour afficher les erreurs rencontrées
+    console.log('Erreur:', error.message);
+
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ success: false, message: 'Token expired' });
+    }
+
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+
     return res.status(401).json({ success: false, message: 'Authentification échouée' });
   }
 };

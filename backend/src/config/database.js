@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config();
+require('dotenv').config({ path: '/home/billy/Work/Inter-Ville-Project/backend/.env' });
 
 /**
  * Configuration de la connexion à la base de données MySQL avec Sequelize
@@ -42,5 +42,7 @@ const test_connection = async () => {
     process.exit(1);
   }
 };
+
+// Suppression des journaux pour éviter d'exposer les informations sensibles
 
 module.exports = { sequelize, test_connection };
