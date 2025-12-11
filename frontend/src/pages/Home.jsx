@@ -26,7 +26,7 @@ export default function Home() {
           </div>
           <div className="badges">
             <span className="pill">Suivi des participations</span>
-            <span className="pill">Commentaires & feedback</span>
+            <span className="pill">Commentaires et feedback</span>
             <span className="pill">Catégories variées</span>
           </div>
         </div>

@@ -24,10 +24,8 @@ export default function ChallengePage() {
 
       <section style={{ marginTop: "20px" }}>
         <h3>Commentaires</h3>
-        <CommentList  />
-        <CommentList  />
-        <CommentList  />
-        <CommentList  />
+        <CommentList   />
+       
 
       </section>
     </div>
