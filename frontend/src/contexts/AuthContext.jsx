@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState } from "react";
-import API from "../api/axiosInstance";
+import React, { createContext, useContext, useState } from 'react';
+import API from '../api/axiosInstance';
 
 const AuthContext = createContext();
 
@@ -10,49 +10,47 @@ export const AuthProvider = ({ children }) => {
   // fonction qui permet de connecter un utilisateur
   const login = async (email, password) => {
     try {
-      const res = await API.post("/auth/login", { email, password });
-      console.log("Login response:", res.data);
+      const res = await API.post('/auth/login', { email, password });
+      console.log('Login response:', res.data);
 
       // Vérifier que la connexion a réussi
       if (!res.data.success) {
-        throw new Error(res.data.message || "Connexion échouée");
+        throw new Error(res.data.message || 'Connexion échouée');
       }
 
       // Stocker le token dans le state
       setToken(res.data.data.accessToken);
 
       // Récupérer les informations de l'utilisateur connecté
-      const userRes = await API.get("/auth/profil", {
+      const userRes = await API.get('/auth/me', {
         headers: {
           Authorization: `Bearer ${res.data.data.accessToken}`,
         },
       });
-      setUser(userRes.data.user);
+      setUser(userRes.data.data.user);
 
       return res.data;
     } catch (err) {
       // Propager l'erreur pour que le composant Login puisse l'afficher
-      throw new Error(err.response?.data?.message || "Connexion échouée");
+      throw new Error(err.response?.data?.message || 'Connexion échouée');
     }
   };
   // fonction qui permet d'enregistrer un nouvel utilisateur
   const register = async (payload) => {
-    if (!payload.email.endsWith("@laplateforme.io"))
-      throw new Error("Email doit être @laplateforme.io");
+    if (!payload.email.endsWith('@laplateforme.io'))
+      throw new Error('Email doit être @laplateforme.io');
     try {
-      const res = await API.post("/auth/register", payload);
+      const res = await API.post('/auth/register', payload);
       return res.data;
     } catch (err) {
       return {
-        message: "Inscription echoué.",
+        message: 'Inscription echoué.',
       };
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={{ user, token, login, register }}>{children}</AuthContext.Provider>
   );
 };
 
