@@ -9,7 +9,7 @@ const generate_token = (user_id) => {
   return jwt.sign(
     { id: user_id },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRE }
+    { expiresIn: jwtExpire }
   );
 };
 
@@ -22,7 +22,7 @@ const generate_refresh_token = (user_id) => {
   return jwt.sign(
     { id: user_id },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_REFRESH_EXPIRE }
+    { expiresIn: '30d' }
   );
 };
 
@@ -56,9 +56,30 @@ const is_token_expired = (token) => {
   }
 };
 
+/**
+ * Génère un token JWT d'accès pour un administrateur
+ * @param {number} admin_id - ID de l'administrateur
+ * @returns {string} Token JWT signé pour l'administrateur
+ */
+const generate_admin_token = (admin_id) => {
+  return jwt.sign(
+    { id: admin_id, role: 'admin' },
+    process.env.JWT_SECRET,
+    { expiresIn: jwtExpire }
+  );
+};
+
+// Augmenter la durée de vie des tokens pour les tests
+const isTestEnvironment = process.env.NODE_ENV === 'test';
+const jwtExpire = isTestEnvironment ? '30d' : process.env.JWT_EXPIRE || '1h';
+
+// Ajout de journaux pour vérifier la valeur de JWT_SECRET
+console.log('JWT_SECRET utilisé pour signer les tokens:', process.env.JWT_SECRET);
+
 module.exports = {
   generate_token,
   generate_refresh_token,
   verify_token,
-  is_token_expired
+  is_token_expired,
+  generate_admin_token,
 };

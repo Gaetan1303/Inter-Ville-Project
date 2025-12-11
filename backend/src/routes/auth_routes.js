@@ -19,9 +19,9 @@ router.post('/login', login);
 // POST /auth/logout
 router.post('/logout', logout);
 
-// Route pour obtenir l'utilisateur connecté - nécessite authentification (à implémenter)
-// GET /auth/moi
-router.get('/profil', get_me);
+// Route pour obtenir l'utilisateur connecté - nécessite authentification
+// GET /auth/me
+router.get('/me', authenticate, get_me);
 
 // Route pour rafraîchir les tokens - accessible à tous
 // POST /auth/refresh-token

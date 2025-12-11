@@ -120,7 +120,6 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validation des champs requis
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -128,28 +127,47 @@ const login = async (req, res) => {
       });
     }
 
+    console.log('Données reçues pour la connexion:', { email, password });
+
     // Vérifier si l'utilisateur existe
+    console.log('Recherche de l\'utilisateur avec l\'email:', email);
     const user = await User.findOne({ where: { email } });
+    console.log('Résultat de la recherche utilisateur:', user);
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Vérifier le mot de passe
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('Validation du mot de passe pour l\'utilisateur:', user.email);
+    console.log('Mot de passe fourni:', password);
+    console.log('Hash stocké:', user.password);
+
+    const isPasswordValid = bcrypt.compareSync(password, user.password);
+    console.log('Résultat bcrypt.compare:', isPasswordValid);
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: 'Email ou mot de passe incorrect' });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Vérifier si l'utilisateur est validé par un admin
+    console.log('Validation du statut de l\'utilisateur:', user.is_validated);
     if (!user.is_validated) {
       return res.status(403).json({ success: false, message: 'Votre compte doit être validé par un administrateur' });
     }
 
     // Générer les tokens
+    console.log('Génération des tokens pour l\'utilisateur:', user.id);
     const accessToken = generate_token(user.id);
     const refreshToken = generate_refresh_token(user.id);
 
+    // Ajout de logs pour inspecter les tokens générés et la réponse envoyée
+    console.log('Tokens générés:', { accessToken, refreshToken });
+    console.log('Réponse envoyée:', {
+      success: true,
+      data: { accessToken, refreshToken },
+    });
+
     // Répondre avec les tokens
+    console.log('Connexion réussie, envoi des tokens.');
     return res.status(200).json({
       success: true,
       message: 'Connexion réussie',
@@ -179,17 +197,46 @@ const logout = async (req, res) => {
 };
 
 /**
- * Récupère les informations de l'utilisateur connecté (à implémenter plus tard)
- * @route GET /api/auth/me
+ * Récupérer les informations de l'utilisateur connecté
+ * @route GET /auth/me
  * @param {Object} req - Objet de requête Express
  * @param {Object} res - Objet de réponse Express
- * @returns {Object} Réponse JSON
+ * @returns {Object} Réponse JSON avec les informations de l'utilisateur connecté
  */
 const get_me = async (req, res) => {
-  res.status(501).json({
-    success: false,
-    message: 'Fonctionnalité pas encore implémentée'
-  });
+  try {
+    const user = req.user; // L'utilisateur est attaché à req par le middleware auth_middleware
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Utilisateur non authentifié",
+      });
+    }
+
+    // Mise à jour de la structure de la réponse pour inclure un objet 'user' dans 'data'
+    res.status(200).json({
+      success: true,
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          city: user.city,
+          promo: user.promo,
+          role: user.role,
+          is_validated: user.is_validated,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'utilisateur connecté:", error);
+    res.status(500).json({
+      success: false,
+      message: "Erreur serveur",
+    });
+  }
 };
 
 /**
