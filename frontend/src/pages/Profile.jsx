@@ -1,9 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-  const { user } = useAuth();
-  if (!user) return <p>Non connecté</p>;
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="container">
@@ -15,7 +26,14 @@ export default function Profile() {
         <p>Ville: {user.city}</p>
         <p>Promo: {user.promo}</p>
         <p>Validé: {user.is_validated ? 'Oui' : 'En attente'}</p>
-        <button>Se déconnecter</button>
+        <button
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+        >
+          Se déconnecter
+        </button>
       </div>
     </div>
   );
