@@ -1,31 +1,9 @@
 import React from "react";
+import { useChallenges } from "../contexts/ChallengeContext";
 import ChallengeCard from "../components/ChallengeCard";
 
-export default function Challenges() {
-  const loading = false;
-  const challenges = [
-    {
-      id: 1,
-      title: "Premier défi",
-      description: "Challenge 1",
-      category: "Sport",
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      title: "deuxieme défi",
-      description: "Challenge 2",
-      category: "code",
-      createdAt: new Date(),
-    },
-    {
-      id: 3,
-      title: "troisieme défi",
-      description: "Challenge 3",
-      category: "cuisine",
-      createdAt: new Date(),
-    },
-  ];
+export default function Feed() {
+  const { challenges, loading } = useChallenges();
 
   if (loading) return <div className="center">Chargement...</div>;
 
@@ -37,8 +15,8 @@ export default function Challenges() {
       </header>
 
       <div className="list">
-        {challenges.map((c) => (
-          <ChallengeCard key={c.id} c={c} />
+        {challenges.map((defi) => (
+          <ChallengeCard key={defi.id} defi={defi} />
         ))}
       </div>
     </div>

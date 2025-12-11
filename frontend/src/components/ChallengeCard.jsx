@@ -1,17 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function ChallengeCard({ c }) {
+export default function ChallengeCard({ defi }) {
   return (
     <article className="card">
-      <Link to={`/challenge/${c.id}`} className="card-link">
+      <Link to={`/challenge/${defi.id}`} className="card-link">
         <div className="card-head">
-          <h3>{c.title}</h3>
-          <span className="tag">{c.category}</span>
+          <h3>{defi.title}</h3>
+          <span className="tag">{defi.category}</span>
         </div>
-        <p className="muted">{c.description}</p>
+        <p className="muted">{defi.description}</p>
         <div className="card-foot">
-          <small>Posté le {new Date(c.createdAt).toLocaleDateString()}</small>
+          <small>Posté le {new Date(defi.createdAt).toLocaleDateString()}</small>
         </div>
       </Link>
     </article>
