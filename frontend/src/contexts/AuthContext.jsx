@@ -35,6 +35,7 @@ export const AuthProvider = ({ children }) => {
       throw new Error(err.response?.data?.message || 'Connexion échouée');
     }
   };
+
   // fonction qui permet d'enregistrer un nouvel utilisateur
   const register = async (payload) => {
     if (!payload.email.endsWith('@laplateforme.io'))
@@ -49,8 +50,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // fonction qui permet de déconnecter un utilisateur
+  const logout = () => {
+    setUser(null);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, register }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, token, login, register, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 

@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const header = () => {
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const closeMenu = () => setMenuOpen(false);
   return (
@@ -20,21 +21,32 @@ const header = () => {
           <span />
           <span />
         </button>
-        <nav className={`nav ${menuOpen ? "nav-open" : ""}`}>
+        <nav className={`nav ${menuOpen ? 'nav-open' : ''}`}>
           <Link to="/" onClick={closeMenu}>
             Accueil
           </Link>
           <Link to="/challenges" onClick={closeMenu}>
             Défis
           </Link>
-          <Link to="/create" onClick={closeMenu}>
-            Créer
-          </Link>
-          <Link to="/profile" onClick={closeMenu}>
-            Profil
-          </Link>
-          {isLoggedIn ? (
-            <Link to="/logout" onClick={closeMenu}>
+          {user && (
+            <>
+              <Link to="/create" onClick={closeMenu}>
+                Créer
+              </Link>
+              <Link to="/profile" onClick={closeMenu}>
+                Profil
+              </Link>
+            </>
+          )}
+
+          {user ? (
+            <Link
+              to="/"
+              onClick={() => {
+                logout();
+                closeMenu();
+              }}
+            >
               Se déconnecter
             </Link>
           ) : (
