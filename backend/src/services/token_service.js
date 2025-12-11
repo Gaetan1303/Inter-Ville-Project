@@ -39,8 +39,26 @@ const verify_token = (token) => {
   }
 };
 
+/**
+ * Vérifie si un token JWT est expiré
+ * @param {string} token - Token JWT à vérifier
+ * @returns {boolean} True si le token est expiré, sinon false
+ */
+const is_token_expired = (token) => {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return false; // Le token est valide
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return true; // Le token est expiré
+    }
+    throw error; // Autre erreur
+  }
+};
+
 module.exports = {
   generate_token,
   generate_refresh_token,
-  verify_token
+  verify_token,
+  is_token_expired
 };
