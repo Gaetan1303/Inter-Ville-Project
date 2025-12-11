@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ChallengeProvider } from "./contexts/ChallengeContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ChallengeProvider>
         <Header />
         <main className="main">
           <Routes>
@@ -26,6 +28,7 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
+        </ChallengeProvider>
       </AuthProvider>
     </BrowserRouter>
   );

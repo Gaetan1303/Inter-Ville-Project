@@ -1,5 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
+/* ============================================
+   VARIABLES & GLOBAL STYLES
+   ============================================ */
+
 :root {
   --bg: #050915;
   --bg-2: #0a1224;
@@ -37,6 +41,10 @@ body {
 a {
   color: inherit;
 }
+
+/* ============================================
+   HEADER & NAVIGATION (All Pages)
+   ============================================ */
 
 .topbar {
   position: sticky;
@@ -113,6 +121,10 @@ a {
   background: var(--text);
 }
 
+/* ============================================
+   LAYOUT & TYPOGRAPHY (All Pages)
+   ============================================ */
+
 .main {
   padding: 32px 24px 60px;
   max-width: 1200px;
@@ -124,27 +136,30 @@ a {
   margin: 0 auto;
 }
 
-.card {
-  background: linear-gradient(145deg, var(--surface) 0%, var(--surface-2) 100%);
-  padding: 18px;
-  border-radius: var(--radius);
-  border: 1px solid var(--stroke);
-  box-shadow: var(--shadow);
-  margin-bottom: 14px;
-  transition: transform 160ms ease, box-shadow 160ms ease,
-    border-color 160ms ease;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--glow);
-  border-color: rgba(60, 240, 197, 0.3);
-}
-
-.row {
+.page-head {
   display: flex;
-  gap: 10px;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
 }
+
+.page-head h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  letter-spacing: -0.02em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.center {
+  text-align: center;
+}
+
+/* ============================================
+   BUTTONS & FORMS (All Pages)
+   ============================================ */
 
 input,
 textarea,
@@ -193,9 +208,22 @@ button:hover {
   transform: translateY(-1px);
   box-shadow: 0 10px 40px rgba(60, 240, 197, 0.25);
 }
-.center {
-  text-align: center;
+
+.ghost-btn {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  border: 1px solid var(--stroke);
+  box-shadow: none;
 }
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+/* ============================================
+   CARDS & BADGES (Home, Feed, ChallengePage)
+   ============================================ */
 
 .pill {
   display: inline-flex;
@@ -269,6 +297,195 @@ button:hover {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 14px;
 }
+
+/* ============================================
+   HOME PAGE
+   ============================================ */
+
+.hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 26px;
+  padding: 26px 0 12px;
+  align-items: center;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin: 0 0 12px;
+  letter-spacing: -0.03em;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.badges {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.stat {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--stroke);
+  padding: 14px;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.stat strong {
+  display: block;
+  font-size: 1.4rem;
+}
+
+.section {
+  margin-top: 34px;
+}
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.mini-card {
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+}
+
+/* ============================================
+   CHALLENGE PAGE (Detail View)
+   ============================================ */
+
+.detail {
+  background: linear-gradient(145deg, var(--surface) 0%, var(--surface-2) 100%);
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow);
+}
+
+.detail-image {
+  max-width: 100%;
+  border-radius: 14px;
+  margin-top: 10px;
+  border: 1px solid var(--stroke);
+}
+
+/* ============================================
+   COMMENTS & REPLIES (ChallengePage)
+   ============================================ */
+
+.comment-form textarea {
+  min-height: 100px;
+}
+
+.comments {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+
+.comment-item {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 1px solid var(--stroke);
+}
+
+.comment-item .meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.comment-item .content {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.reply-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--stroke);
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.reply-btn:hover {
+  background: rgba(60, 240, 197, 0.1);
+  border-color: rgba(60, 240, 197, 0.35);
+  transform: none;
+  box-shadow: none;
+}
+
+.reply-form {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--stroke);
+}
+
+.reply-label {
+  display: block;
+  color: var(--accent);
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+}
+
+.reply-form textarea {
+  min-height: 70px;
+  margin-bottom: 8px;
+}
+
+.reply-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.reply-actions button {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.comments.replies {
+  margin-top: 10px;
+  margin-left: 12px;
+  border-left: 2px solid var(--stroke);
+  padding-left: 12px;
+}
+
+.comment-reply {
+  background: rgba(255, 255, 255, 0.01);
+  padding: 10px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN (Mobile)
+   ============================================ */
 
 @media (max-width: 640px) {
   .topbar {
