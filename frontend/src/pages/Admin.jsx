@@ -1,31 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAdmin } from '../contexts/AdminContext';
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/Admin.css';
 
 export default function Admin() {
-  // État pour les utilisateurs en attente
-  const [pendingUsers] = useState([
-    {
-      id: 1,
-      email: 'alice@example.com',
-      username: 'alice_dev',
-      created_at: '2025-12-10',
-      is_validated: false,
-    },
-    {
-      id: 2,
-      email: 'bob@example.com',
-      username: 'bob_coder',
-      created_at: '2025-12-09',
-      is_validated: false,
-    },
-    {
-      id: 3,
-      email: 'charlie@example.com',
-      username: 'charlie_dev',
-      created_at: '2025-12-08',
-      is_validated: false,
-    },
-  ]);
+  const { pendingUsers, loading, error, fetchPendingUsers, validateUser } = useAdmin();
+  const { user } = useAuth();
+  console.log(pendingUsers, 'pendingUsers');
 
   // État pour les challenges
   const [challenges] = useState([
@@ -89,8 +70,13 @@ export default function Admin() {
   };
 
   // Handlers
-  const handleValidateUser = (userId) => {
-    alert(`Utilisateur ${userId} validé ! (Appel API: PUT /admin/users/${userId}/validate)`);
+  const handleValidateUser = async (userId) => {
+    try {
+      await validateUser(userId);
+      alert(`Utilisateur ${userId} validé avec succès !`);
+    } catch (err) {
+      alert("Erreur lors de la validation de l'utilisateur.");
+    }
   };
 
   const handleDeleteChallenge = (challengeId) => {
@@ -102,6 +88,15 @@ export default function Admin() {
   const handleDeleteComment = (commentId) => {
     alert(`Commentaire ${commentId} supprimé ! (Appel API: DELETE /admin/comments/${commentId})`);
   };
+
+  // Charger les utilisateurs en attente quand l'utilisateur connecté existe
+  useEffect(() => {
+    console.log('Current user in Admin page:', user);
+
+    if (user) {
+      fetchPendingUsers();
+    }
+  }, [user]);
 
   return (
     <div className="admin-container">
@@ -133,7 +128,15 @@ export default function Admin() {
       {/* Gestion des utilisateurs en attente */}
       <section className="users-section">
         <h2>Comptes en Attente de Validation</h2>
-        {pendingUsers.length > 0 ? (
+        {error && <p className="empty-message">Erreur: {error}</p>}
+        {loading && <p className="empty-message">Chargement des comptes en attente…</p>}
+        {!loading && !user && (
+          <p className="empty-message">Veuillez vous connecter pour accéder à cette section.</p>
+        )}
+        {!loading && user && user.role !== 'admin' && (
+          <p className="empty-message">Accès réservé aux administrateurs.</p>
+        )}
+        {!loading && pendingUsers.length > 0 && user?.role === 'admin' ? (
           <table className="admin-table">
             <thead>
               <tr>
@@ -149,8 +152,10 @@ export default function Admin() {
                 <tr key={user.id}>
                   <td>{user.id}</td>
                   <td>{user.email}</td>
-                  <td>{user.username}</td>
-                  <td>{user.created_at}</td>
+                  <td>
+                    {user.first_name} {user.last_name}
+                  </td>
+                  <td>{user.createdAt}</td>
                   <td>
                     <button
                       className="btn btn-validate"
@@ -164,7 +169,15 @@ export default function Admin() {
             </tbody>
           </table>
         ) : (
-          <p className="empty-message">Aucun compte en attente de validation.</p>
+          !loading &&
+          user?.role === 'admin' && (
+            <div>
+              <p className="empty-message">Aucun compte en attente de validation.</p>
+              <button className="btn" onClick={fetchPendingUsers}>
+                Rafraîchir
+              </button>
+            </div>
+          )
         )}
       </section>
 

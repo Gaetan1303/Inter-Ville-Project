@@ -8,10 +8,13 @@ export default function ChallengePage() {
   const { fetchChallengeById } = useChallenges();
   const [challenge, setChallenge] = useState(null);
 
+
   // appel de la fonction fetchChallengeById du contexte a chaque changement d'id
   useEffect(() => {
     load();
   }, [id]);
+
+  
   const load = async () => {
     try {
       // appel de la fonction fetchChallengeById du contexte

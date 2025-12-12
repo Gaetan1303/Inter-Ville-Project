@@ -18,11 +18,15 @@ export const AuthProvider = ({ children }) => {
         throw new Error(res.data.message || 'Connexion échouée');
       }
 
-      // Stocker le token dans le state
-      setToken(res.data.data.accessToken);
+      // Stocker le token dans le state et dans le localStorage
+      const accessToken = res.data.data.accessToken;
+      setToken(accessToken);
+      try {
+        localStorage.setItem('accessToken', accessToken);
+      } catch (_) {}
 
-      // Injecte le token dans axios pour toutes les futures requêtes
-      API.defaults.headers.common['Authorization'] = `Bearer ${res.data.data.accessToken}`;
+      // Injecter le token dans axios pour toutes les futures requêtes
+      API.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
       // Récupérer les informations de l'utilisateur connecté
       const userRes = await API.get('/auth/me');
@@ -52,6 +56,11 @@ export const AuthProvider = ({ children }) => {
   // fonction qui permet de déconnecter un utilisateur
   const logout = () => {
     setUser(null);
+    setToken(null);
+    try {
+      localStorage.removeItem('accessToken');
+    } catch (_) {}
+    delete API.defaults.headers.common['Authorization'];
   };
 
   return (
