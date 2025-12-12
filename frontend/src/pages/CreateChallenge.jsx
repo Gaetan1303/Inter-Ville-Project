@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChallenges } from '../contexts/ChallengeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CreateChallenge() {
   const [title, setTitle] = useState('');
@@ -14,10 +15,13 @@ export default function CreateChallenge() {
   const [success, setSuccess] = useState('');
 
   const { createChallenge } = useChallenges();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
+  // gestion de la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) return alert('Connecte-toi pour créer un challenge');
     setLoading(true);
     setError('');
     setSuccess('');
@@ -30,8 +34,9 @@ export default function CreateChallenge() {
         difficulty,
         start_date: startDate,
         end_date: endDate,
-        created_by: 5,
+        created_by: user.id,
       };
+      // Appel de la fonction createChallenge du contexte
       const created = await createChallenge(payload);
 
       if (created && created.id) {
