@@ -22,14 +22,14 @@ const header = () => {
           <span />
         </button>
         <nav className={`nav ${menuOpen ? 'nav-open' : ''}`}>
+          <Link to="/" onClick={closeMenu}>
+            Accueil
+          </Link>
           {user && user.role === 'admin' && (
             <Link to="/admin" onClick={closeMenu}>
               Admin
             </Link>
           )}
-          <Link to="/" onClick={closeMenu}>
-            Accueil
-          </Link>
           <Link to="/challenges" onClick={closeMenu}>
             Défis
           </Link>

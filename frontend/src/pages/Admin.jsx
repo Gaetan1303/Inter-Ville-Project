@@ -1,40 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useChallenges } from '../contexts/ChallengeContext';
 import '../styles/Admin.css';
 
 export default function Admin() {
   const { pendingUsers, loading, error, fetchPendingUsers, validateUser } = useAdmin();
   const { user } = useAuth();
+  const { challenges } = useChallenges();
   console.log(pendingUsers, 'pendingUsers');
 
-  // État pour les challenges
-  const [challenges] = useState([
-    {
-      id: 101,
-      title: 'Challenge Code Avancé',
-      created_by: 5,
-      category: 'Code',
-      difficulty: 'hard',
-      status: 'active',
-    },
-    {
-      id: 102,
-      title: 'Photo Challenge',
-      created_by: 7,
-      category: 'Photo',
-      difficulty: 'medium',
-      status: 'active',
-    },
-    {
-      id: 103,
-      title: 'Défi Culinaire',
-      created_by: 8,
-      category: 'Cuisine',
-      difficulty: 'easy',
-      status: 'completed',
-    },
-  ]);
+  // // État pour les challenges
+  // const [challenges] = useState([
+  //   {
+  //     id: 101,
+  //     title: 'Challenge Code Avancé',
+  //     created_by: 5,
+  //     category: 'Code',
+  //     difficulty: 'hard',
+  //     status: 'active',
+  //   },
+  //   {
+  //     id: 102,
+  //     title: 'Photo Challenge',
+  //     created_by: 7,
+  //     category: 'Photo',
+  //     difficulty: 'medium',
+  //     status: 'active',
+  //   },
+  //   {
+  //     id: 103,
+  //     title: 'Défi Culinaire',
+  //     created_by: 8,
+  //     category: 'Cuisine',
+  //     difficulty: 'easy',
+  //     status: 'completed',
+  //   },
+  // ]);
 
   // État pour les commentaires
   const [comments] = useState([
