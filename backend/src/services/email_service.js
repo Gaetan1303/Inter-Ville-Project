@@ -49,7 +49,14 @@ const send_validation_email = async (email, first_name) => {
       to: email,
       subject: 'Votre compte CDPI Network a été validé ',
       html: `
-       
+        <div style="font-family: Arial, sans-serif; line-height:1.4; color:#333;">
+          <h2>Bonjour ${first_name || ''},</h2>
+          <p>Votre compte sur <strong>CDPI Network</strong> a été validé par un administrateur.</p>
+          <p>Vous pouvez désormais vous connecter et profiter de toutes les fonctionnalités : proposer des challenges, commenter et participer.</p>
+          <p>Bonne découverte 👋</p>
+          <hr />
+          <small>Si vous n'avez pas créé de compte, ignorez cet email ou contactez l'administrateur.</small>
+        </div>
       `
     };
 
