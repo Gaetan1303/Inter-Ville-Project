@@ -144,7 +144,7 @@ const init_associations = () => {
     as: 'receiver'
   });
 
-  console.log('✅ Associations entre modèles initialisées');
+  // console.log supprimé (associations modèles)
 };
 
 // Initialiser les associations

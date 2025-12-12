@@ -5,7 +5,6 @@ const { User } = require('../models');
 exports.getCommentsByChallenge = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('[GET] Récupération des commentaires pour le challenge', id);
     const comments = await Comment.findAll({
       where: { challenge_id: id, parent_id: null },
       include: [
@@ -26,7 +25,7 @@ exports.getCommentsByChallenge = async (req, res) => {
       ],
       order: [['createdAt', 'ASC']]
     });
-    console.log('[GET] Nombre de commentaires trouvés:', comments.length);
+    // ...existing code...
     res.json(comments);
   } catch (err) {
     console.error('[GET] Erreur récupération commentaires:', err);
@@ -39,13 +38,10 @@ exports.addComment = async (req, res) => {
   try {
     const { content, challenge_id, parent_id } = req.body;
     const user_id = req.user.id;
-    console.log('[POST] Ajout commentaire', { content, challenge_id, user_id, parent_id });
     const comment = await Comment.create({ content, challenge_id, user_id, parent_id: parent_id || null });
-    console.log('[POST] Commentaire créé avec id:', comment.id);
     res.status(201).json(comment);
   } catch (err) {
-    console.error('[POST] Erreur ajout commentaire:', err);
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ success: false, error: err.message });
   }
 };
 
@@ -53,7 +49,7 @@ exports.addComment = async (req, res) => {
 exports.deleteComment = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log('[DELETE] Suppression commentaire id:', id);
+    // ...existing code...
     const comment = await Comment.findByPk(id);
     if (!comment) {
       console.warn('[DELETE] Commentaire non trouvé:', id);
@@ -64,7 +60,7 @@ exports.deleteComment = async (req, res) => {
       return res.status(403).json({ error: 'Non autorisé' });
     }
     await comment.destroy();
-    console.log('[DELETE] Commentaire supprimé:', id);
+    // ...existing code...
     res.json({ message: 'Commentaire supprimé' });
   } catch (err) {
     console.error('[DELETE] Erreur suppression commentaire:', err);

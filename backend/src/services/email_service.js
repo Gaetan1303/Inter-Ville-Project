@@ -29,7 +29,7 @@ const send_welcome_email = async (email, first_name) => {
     };
 
     await transporter.sendMail(mail_options);
-    console.log(` Email de bienvenue envoyé à ${email}`);
+    // Email de bienvenue envoyé (log supprimé pour sécurité)
   } catch (error) {
     console.error(' Erreur lors de l\'envoi de l\'email de bienvenue:', error.message);
     // On ne bloque pas l'inscription si l'email échoue
@@ -61,7 +61,7 @@ const send_validation_email = async (email, first_name) => {
     };
 
     await transporter.sendMail(mail_options);
-    console.log(` Email de validation envoyé à ${email}`);
+    // Email de validation envoyé (log supprimé pour sécurité)
   } catch (error) {
     console.error(' Erreur lors de l\'envoi de l\'email de validation:', error.message);
   }

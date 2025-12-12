@@ -1,3 +1,12 @@
+// Upload d'une image de challenge
+exports.uploadChallengeImage = (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'Aucun fichier envoyé' });
+  }
+  // Retourne le chemin relatif à stocker dans la BDD
+  const imagePath = `/uploads/challenges/${req.file.filename}`;
+  res.status(201).json({ success: true, image: imagePath });
+};
 const Challenge = require('../models/Challenge');
 
 // Liste des challenges avec filtres
