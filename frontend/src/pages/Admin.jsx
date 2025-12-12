@@ -39,7 +39,7 @@ export default function Admin() {
   // Statistiques globales
   const stats = {
     users: 45,
-    challenges: 12,
+    challenges: challenges.length,
     comments: 87,
     pendingValidation: pendingUsers.length,
   };
