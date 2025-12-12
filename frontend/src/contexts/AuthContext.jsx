@@ -21,12 +21,11 @@ export const AuthProvider = ({ children }) => {
       // Stocker le token dans le state
       setToken(res.data.data.accessToken);
 
+      // Injecte le token dans axios pour toutes les futures requêtes
+      API.defaults.headers.common['Authorization'] = `Bearer ${res.data.data.accessToken}`;
+
       // Récupérer les informations de l'utilisateur connecté
-      const userRes = await API.get('/auth/me', {
-        headers: {
-          Authorization: `Bearer ${res.data.data.accessToken}`,
-        },
-      });
+      const userRes = await API.get('/auth/me');
       setUser(userRes.data.data.user);
 
       return res.data;
