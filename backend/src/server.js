@@ -41,20 +41,19 @@ const start_server = async () => {
     // Synchroniser les modèles avec la base de données
     // { alter: true } met à jour la structure sans supprimer les données
     await sequelize.sync({ alter: true });
-    console.log(' Modèles synchronisés avec la base de données');
+    // console.log supprimé (synchronisation modèles)
     
     // Démarrer le serveur HTTP avec Socket.IO
     server.listen(PORT, () => {
-      console.log('');
-      console.log(' ================================');
-      console.log(` Serveur CDPI Network démarré`);
-      console.log(` Environnement: ${process.env.NODE_ENV}`);
-      console.log(` Port: ${PORT}`);
-      console.log(` URL: http://localhost:${PORT}`);
-      console.log(` API: http://localhost:${PORT}/`);
-      console.log(` WebSocket: Socket.IO activé`);
-      console.log(' ================================');
-      console.log('');
+      // console.log supprimé (bannière serveur)
+      // console.log supprimé (serveur démarré)
+      // console.log supprimé (environnement)
+      // console.log supprimé (port)
+      // console.log supprimé (url)
+      // console.log supprimé (api)
+      // console.log supprimé (websocket)
+      // console.log supprimé (bannière serveur)
+      // console.log supprimé (ligne vide)
     });
     
   } catch (error) {
@@ -67,11 +66,11 @@ const start_server = async () => {
  * Gestion de l'arrêt gracieux du serveur
  */
 process.on('SIGINT', async () => {
-  console.log('\n  Arrêt du serveur en cours...');
+  // console.log supprimé (arrêt serveur)
   
   try {
     await sequelize.close();
-    console.log(' Connexion à la base de données fermée');
+    // console.log supprimé (fermeture bdd)
     process.exit(0);
   } catch (error) {
     console.error('Erreur lors de la fermeture de la connexion à la base de données:', error);

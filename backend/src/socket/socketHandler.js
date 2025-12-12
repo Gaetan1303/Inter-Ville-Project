@@ -5,16 +5,16 @@
 
 const initializeSocketHandlers = (io) => {
   io.on('connection', (socket) => {
-    console.log(` Client connecté: ${socket.id}`);
+    // Log connexion client supprimé pour sécurité
     
     // Evenement de déconnexion
     socket.on('disconnect', () => {
-      console.log(` Client déconnecté: ${socket.id}`);
+      // Log déconnexion client supprimé pour sécurité
     });
     
     // Evenement message
     socket.on('message', (data) => {
-      console.log(' Message reçu:', data);
+      // Log message reçu supprimé pour sécurité
       // Diffuser le message à tous les clients connectés
       io.emit('message', data);
     });

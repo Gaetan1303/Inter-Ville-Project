@@ -74,7 +74,7 @@ const isTestEnvironment = process.env.NODE_ENV === 'test';
 const jwtExpire = isTestEnvironment ? '30d' : process.env.JWT_EXPIRE || '1h';
 
 // Ajout de journaux pour vérifier la valeur de JWT_SECRET
-console.log('JWT_SECRET utilisé pour signer les tokens:', process.env.JWT_SECRET);
+// console.log supprimé pour sécurité
 
 module.exports = {
   generate_token,

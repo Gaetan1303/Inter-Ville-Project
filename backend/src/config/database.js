@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config({ path: '/home/billy/Work/Inter-Ville-Project/backend/.env' });
+require('dotenv').config();
 
 /**
  * Configuration de la connexion à la base de données MySQL avec Sequelize
@@ -36,7 +36,7 @@ const sequelize = new Sequelize(
 const test_connection = async () => {
   try {
     await sequelize.authenticate();
-    console.log(' Connexion à MySQL réussie');
+    // console.log supprimé (connexion MySQL)
   } catch (error) {
     console.error(' Erreur de connexion à MySQL:', error.message);
     process.exit(1);

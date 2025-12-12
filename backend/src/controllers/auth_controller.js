@@ -127,47 +127,43 @@ const login = async (req, res) => {
       });
     }
 
-    console.log('Données reçues pour la connexion:', { email, password });
+    // console.log supprimé (données reçues)
 
     // Vérifier si l'utilisateur existe
-    console.log('Recherche de l\'utilisateur avec l\'email:', email);
+    // console.log supprimé (recherche utilisateur)
     const user = await User.findOne({ where: { email } });
-    console.log('Résultat de la recherche utilisateur:', user);
+    // console.log supprimé (résultat recherche utilisateur)
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Vérifier le mot de passe
-    console.log('Validation du mot de passe pour l\'utilisateur:', user.email);
-    console.log('Mot de passe fourni:', password);
-    console.log('Hash stocké:', user.password);
+    // console.log supprimé (validation mot de passe)
+    // console.log supprimé (mot de passe fourni)
+    // console.log supprimé (hash stocké)
 
     const isPasswordValid = bcrypt.compareSync(password, user.password);
-    console.log('Résultat bcrypt.compare:', isPasswordValid);
+    // console.log supprimé (résultat bcrypt)
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // Vérifier si l'utilisateur est validé par un admin
-    console.log('Validation du statut de l\'utilisateur:', user.is_validated);
+    // console.log supprimé (validation statut utilisateur)
     if (!user.is_validated) {
       return res.status(403).json({ success: false, message: 'Votre compte doit être validé par un administrateur' });
     }
 
     // Générer les tokens
-    console.log('Génération des tokens pour l\'utilisateur:', user.id);
+    // console.log supprimé (génération tokens)
     const accessToken = generate_token(user.id);
     const refreshToken = generate_refresh_token(user.id);
 
     // Ajout de logs pour inspecter les tokens générés et la réponse envoyée
-    console.log('Tokens générés:', { accessToken, refreshToken });
-    console.log('Réponse envoyée:', {
-      success: true,
-      data: { accessToken, refreshToken },
-    });
-
+    // console.log supprimé (tokens générés)
+    // console.log supprimé (réponse envoyée)
     // Répondre avec les tokens
-    console.log('Connexion réussie, envoi des tokens.');
+    // console.log supprimé (connexion réussie)
     return res.status(200).json({
       success: true,
       message: 'Connexion réussie',

@@ -23,7 +23,7 @@ const Challenge = sequelize.define('Challenge', {
     comment: 'Description détaillée du challenge'
   },
   category: {
-    type: DataTypes.STRING(100),
+    type: DataTypes.ENUM('code', 'design', 'sport', 'autre'),
     allowNull: false,
     comment: 'Catégorie du challenge (code, design, sport, etc.)'
   },

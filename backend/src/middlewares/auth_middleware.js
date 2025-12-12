@@ -16,9 +16,9 @@ const authenticate = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    console.log('Token:', token); // Ajout de journaux pour déboguer les valeurs du jeton
+    // console.log supprimé (token)
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Contenu décodé du token:', decoded); // Ajout de journaux pour vérifier le contenu du token
+    // console.log supprimé (contenu décodé)
 
     const user = await User.findByPk(decoded.id);
     if (!user) {
@@ -31,7 +31,7 @@ const authenticate = async (req, res, next) => {
     console.error('Erreur d\'authentification:', error);
 
     // Ajout de journaux pour afficher les erreurs rencontrées
-    console.log('Erreur:', error.message);
+    // console.log supprimé (erreur)
 
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ success: false, message: 'Token expired' });

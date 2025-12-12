@@ -1,10 +1,12 @@
+
 const express = require("express");
+const rateLimit = require("express-rate-limit");
+const { swaggerUi, swaggerSpec } = require("./config/swagger");
 const cors = require("cors");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const compression = require("compression");
 require("dotenv").config();
-
 const routes = require("./routes");
 
 /**
@@ -12,6 +14,25 @@ const routes = require("./routes");
  * Initialise tous les middlewares et routes
  */
 const app = express();
+
+
+// Rate limiting global (100 requêtes/15min par IP)
+const limiter = rateLimit({
+  windowMs: process.env.NODE_ENV === 'test' ? 2000 : 15 * 60 * 1000, // 2 secondes en test, 15 min sinon
+  max: 100, // Limite chaque IP à 100 requêtes par fenêtre
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => {
+    if (process.env.NODE_ENV === 'test') {
+      // Désactive le rate-limit sur /api-docs et /auth/me en test
+      return req.path.startsWith('/api-docs') || req.path === '/auth/me';
+    }
+    return false;
+  }
+});
+app.use(limiter);
+// Documentation Swagger
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 /**
  * Middlewares de sécurité et performance
