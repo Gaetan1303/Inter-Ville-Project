@@ -63,7 +63,10 @@ export const AdminProvider = ({ children }) => {
   const deleteChallenge = async (challengeId) => {
     try {
       const res = await API.delete(`/admin/challenges/${challengeId}`);
-      return res.data;
+      if (!res.data.success) {
+        throw new Error(res.data.message || 'Erreur lors de la suppression');
+      }
+      return res.data.data;
     } catch (err) {
       console.error('Erreur lors de la suppression du challenge:', err);
       throw err;
@@ -74,7 +77,10 @@ export const AdminProvider = ({ children }) => {
   const deleteComment = async (commentId) => {
     try {
       const res = await API.delete(`/admin/comments/${commentId}`);
-      return res.data;
+      if (!res.data.success) {
+        throw new Error(res.data.message || 'Erreur lors de la suppression');
+      }
+      return res.data.data;
     } catch (err) {
       console.error('Erreur lors de la suppression du commentaire:', err);
       throw err;
