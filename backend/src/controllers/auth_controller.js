@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { generate_token, generate_refresh_token, verify_token } = require('../services/token_service');
-const { send_welcome_email } = require('../services/email_service');
+const { send_welcome_email, send_validation_email } = require('../services/email_service');
 
 /**
  * Inscription d'un nouvel utilisateur
@@ -297,6 +297,11 @@ const validate_user = async (req, res) => {
 
     userToValidate.is_validated = true;
     await userToValidate.save();
+
+    // Envoyer un email de validation à l'utilisateur (non bloquant)
+    send_validation_email(userToValidate.email, userToValidate.first_name).catch(err => {
+      console.error('Erreur lors de l\'envoi de l\'email de validation:', err);
+    });
 
     return res.status(200).json({
       success: true,

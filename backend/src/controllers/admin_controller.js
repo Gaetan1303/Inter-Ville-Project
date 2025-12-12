@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Challenge = require('../models/Challenge');
 const Comment = require('../models/Comment');
+const { send_validation_email } = require('../services/email_service');
 
 /**
  * Récupérer les comptes en attente de validation
@@ -49,6 +50,11 @@ const validate_user = async (req, res) => {
     // Mettre à jour le champ is_validated
     user.is_validated = true;
     await user.save();
+
+    // Envoyer un email de validation (non bloquant)
+    send_validation_email(user.email, user.first_name).catch(err => {
+      console.error('Erreur lors de l\'envoi de l\'email de validation:', err);
+    });
 
     res.status(200).json({
       success: true,
