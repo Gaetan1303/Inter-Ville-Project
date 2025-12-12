@@ -3,6 +3,7 @@ const router = express.Router();
 const auth_routes = require('./auth_routes');
 const challengeRoutes = require('./challenge_routes');
 const adminRoutes = require('./admin_routes');
+const commentRoutes = require('./comment_routes');
 
 /**
  * Point d'entrée principal de toutes les routes de l'API
@@ -12,6 +13,7 @@ const adminRoutes = require('./admin_routes');
 router.use('/auth', auth_routes);
 router.use('/', challengeRoutes);
 router.use('/admin', adminRoutes);
+router.use('/comments', commentRoutes);
 
 /**
  * Route racine de l'API - Message de bienvenue et documentation
