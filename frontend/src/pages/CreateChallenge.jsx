@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 export default function CreateChallenge() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Code');
+  const [category, setCategory] = useState('code');
   const [difficulty, setDifficulty] = useState('easy');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -44,7 +44,7 @@ export default function CreateChallenge() {
         // Reset form fields only on success
         setTitle('');
         setDescription('');
-        setCategory('Code');
+        setCategory('code');
         setDifficulty('easy');
         setStartDate('');
         setEndDate('');
@@ -77,13 +77,15 @@ export default function CreateChallenge() {
           required
         />
         <div className="row">
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="Code">Code</option>
-            <option value="Sport">Sport</option>
-            <option value="Photo">Photo</option>
-            <option value="Cuisine">Cuisine</option>
+          <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+            <option value="">-- Choisir une catégorie --</option>
+            <option value="code">Code</option>
+            <option value="sport">Sport</option>
+            <option value="design">Design</option>
+            <option value="autre">Autre</option>
           </select>
-          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+          <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} required>
+            <option value="">-- Choisir difficulté --</option>
             <option value="easy">Facile</option>
             <option value="medium">Moyen</option>
             <option value="hard">Difficile</option>

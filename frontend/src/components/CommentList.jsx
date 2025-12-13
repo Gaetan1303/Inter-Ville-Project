@@ -59,14 +59,14 @@ export default function CommentList({ challengeId }) {
       <div className="comment-card">
         <div className="meta">
           <strong>{comment.author?.first_name || "user#" + comment.user_id}</strong>
-          {comment.author?.promo && <span className="promo"> • {comment.author.promo}</span>}
+          {comment.author?.promo && <span className="promo"> / {comment.author.promo}</span>}
           {" "}
           <span className="date">
             {new Date(comment.createdAt).toLocaleDateString("fr-FR")}
           </span>
         </div>
         <div className="content">{comment.content}</div>
-        <button
+        {!comment.parent_id && (<button
           className="reply-btn"
           onClick={() =>
             setReplyingTo({
@@ -76,7 +76,8 @@ export default function CommentList({ challengeId }) {
           }
         >
           Répondre
-        </button>
+        </button>)}
+        
 
         {/* Inline reply form si c'est ce commentaire */}
         {replyingTo?.parentId === comment.id && (
@@ -129,8 +130,7 @@ export default function CommentList({ challengeId }) {
   );
 
   return (
-    <div className="comment-section">
-      <h3>Commentaires</h3>
+    <div className="comment-section">      
       <form onSubmit={submit} className="comment-form">
         <textarea
           value={text}
