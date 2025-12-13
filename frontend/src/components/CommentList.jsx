@@ -38,14 +38,13 @@ export default function CommentList({ challengeId }) {
     const submit = async (e) => {
     e.preventDefault();
     if (!user) return alert("Connecte-toi pour commenter");
-    const res = await postComment({
+    await postComment({
       challengeId,      
       content: text,
+      user_id: user.id,
     });
-    setComments((prev) => [
-    res,
-      ...prev,
-    ]);
+    // Recharger tous les commentaires pour avoir les données User complètes
+    await load();
     setText("");
   };
 

@@ -1,5 +1,4 @@
-// Configuration Swagger pour la documentation de l'API
-const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 
 const options = {
@@ -12,14 +11,14 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: process.env.API_URL || 'http://localhost:5000',
         description: 'Serveur de développement',
       },
     ],
   },
-  apis: ['./src/routes/*.js', './src/models/*.js'], // Documentation dans les routes et modèles
+  apis: ['src/routes/**/*.js', 'src/controllers/**/*.js', 'src/models/**/*.js'],
 };
 
-const swaggerSpec = swaggerJSDoc(options);
+const swaggerSpec = swaggerJsdoc(options);
 
 module.exports = { swaggerUi, swaggerSpec };

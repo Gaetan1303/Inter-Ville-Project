@@ -66,12 +66,14 @@ export const ChallengeProvider = ({ children }) => {
     challengeId,    
     content,
     parent_id,
+    user_id,
   }) => {
     try {
       const res = await API.post("/comments", {
         challenge_id: challengeId,        
         content,
         parent_id: parent_id || null,
+        user_id,
       });
       return res.data;
     } catch (err) {
@@ -79,6 +81,7 @@ export const ChallengeProvider = ({ children }) => {
     }
   };
 
+ 
   return (
     <ChallengeContext.Provider
       value={{
@@ -90,6 +93,7 @@ export const ChallengeProvider = ({ children }) => {
         fetchChallengeById,
         fetchComments,
         postComment,
+        
       }}
     >
       {children}
