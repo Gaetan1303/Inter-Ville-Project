@@ -23,6 +23,8 @@ export const ChallengeProvider = ({ children }) => {
   useEffect(() => {
     fetchChallenges();
   }, []);
+
+  
   // fonction pour créer un nouveau défi
   const createChallenge = async (payload) => {
     try {
@@ -34,6 +36,8 @@ export const ChallengeProvider = ({ children }) => {
       throw err;
     }
   };
+
+
   // fonction pour récupérer un défi par son ID
   const fetchChallengeById = async (id) => {
     try {
@@ -42,6 +46,18 @@ export const ChallengeProvider = ({ children }) => {
     } catch (err) {
       console.error('Erreur lors de la récupération du défi.', err);
       throw err;
+    }
+  };
+
+
+  // fonction pour récupérer les commentaires d'un défi
+   const fetchComments = async (challengeId) => {
+    // /comments/challenge/${challengeId}
+    try {
+      const res = await API.get(`/comments/challenge/${challengeId}`);
+      return res.data;
+    } catch (err) {
+      console.error('Erreur lors de la récupération des commentaires.', err);
     }
   };
 
@@ -54,6 +70,7 @@ export const ChallengeProvider = ({ children }) => {
         fetchChallenges,
         createChallenge,
         fetchChallengeById,
+        fetchComments,
       }}
     >
       {children}
