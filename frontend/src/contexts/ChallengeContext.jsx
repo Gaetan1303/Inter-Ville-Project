@@ -49,6 +49,7 @@ export const ChallengeProvider = ({ children }) => {
     <ChallengeContext.Provider
       value={{
         challenges,
+        setChallenges,
         loading,
         fetchChallenges,
         createChallenge,

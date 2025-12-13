@@ -25,6 +25,11 @@ const header = () => {
           <Link to="/" onClick={closeMenu}>
             Accueil
           </Link>
+          {user && user.role === 'admin' && (
+            <Link to="/admin" onClick={closeMenu}>
+              Admin
+            </Link>
+          )}
           <Link to="/challenges" onClick={closeMenu}>
             Défis
           </Link>
