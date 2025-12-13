@@ -78,10 +78,10 @@ export default function CreateChallenge() {
         />
         <div className="row">
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option>Code</option>
-            <option>Sport</option>
-            <option>Photo</option>
-            <option>Cuisine</option>
+            <option value="Code">Code</option>
+            <option value="Sport">Sport</option>
+            <option value="Photo">Photo</option>
+            <option value="Cuisine">Cuisine</option>
           </select>
           <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
             <option value="easy">Facile</option>
