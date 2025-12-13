@@ -5,8 +5,16 @@ import { useChallenges } from '../contexts/ChallengeContext';
 import '../styles/Admin.css';
 
 export default function Admin() {
-  const { pendingUsers, loading, error, fetchPendingUsers, validateUser, deleteChallenge } =
-    useAdmin();
+  const {
+    pendingUsers,
+    loading,
+    error,
+    fetchPendingUsers,
+    validateUser,
+    deleteChallenge,
+    fetchStats,
+    stats,
+  } = useAdmin();
   const { user } = useAuth();
   const { challenges, setChallenges } = useChallenges();
   console.log(pendingUsers, 'pendingUsers');
@@ -36,11 +44,15 @@ export default function Admin() {
     },
   ]);
 
+  useEffect(() => {
+    fetchStats();
+  }, [challenges]);
+
   // Statistiques globales
-  const stats = {
-    users: 45,
-    challenges: challenges.length,
-    comments: 87,
+  const stateGlobal = {
+    utilisateurs: stats?.users ?? 0,
+    challenges: stats?.challenges ?? 0,
+    comments: stats?.comments ?? 0,
     pendingValidation: pendingUsers.length,
   };
 
@@ -94,19 +106,19 @@ export default function Admin() {
         <div className="stats-grid">
           <div className="stat-card">
             <div className="stat-label">Utilisateurs</div>
-            <div className="stat-value">{stats.users}</div>
+            <div className="stat-value">{stateGlobal.utilisateurs}</div>
           </div>
           <div className="stat-card">
             <div className="stat-label">Challenges</div>
-            <div className="stat-value">{stats.challenges}</div>
+            <div className="stat-value">{stateGlobal.challenges}</div>
           </div>
           <div className="stat-card">
             <div className="stat-label">Commentaires</div>
-            <div className="stat-value">{stats.comments}</div>
+            <div className="stat-value">{stateGlobal.comments}</div>
           </div>
           <div className="stat-card highlight">
             <div className="stat-label">En attente de validation</div>
-            <div className="stat-value">{stats.pendingValidation}</div>
+            <div className="stat-value">{stateGlobal.pendingValidation}</div>
           </div>
         </div>
       </section>

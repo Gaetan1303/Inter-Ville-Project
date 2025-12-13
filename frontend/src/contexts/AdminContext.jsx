@@ -48,11 +48,13 @@ export const AdminProvider = ({ children }) => {
   // Récupérer les statistiques globales
   const fetchStats = async () => {
     try {
+      console.log('Fetching admin stats...');
       const res = await API.get('/admin/stats');
       if (res.data.success) {
+        console.log('Admin stats fetched:', res.data.data);
         setStats(res.data.data);
       }
-      return res.data;
+      return res.data.data;
     } catch (err) {
       console.error('Erreur lors de la récupération des statistiques:', err);
       throw err;
