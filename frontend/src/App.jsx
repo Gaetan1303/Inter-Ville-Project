@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Challenges from './pages/Challenges';
 import ChallengeDetail from './pages/ChallengeDetail';
 import CreateChallenge from './pages/CreateChallenge';
+import EditChallenge from './pages/EditChallenge';
 import Admin from './pages/Admin';
 
 const ProtectedAdminRoute = ({ children }) => {
@@ -34,6 +35,7 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/Challenges" element={<Challenges />} />
                 <Route path="/Challenge/:id" element={<ChallengeDetail />} />
+                <Route path="/challenges/:id/edit" element={<EditChallenge />} />
                 <Route path="/create" element={<CreateChallenge />} />
                 <Route
                   path="/admin"

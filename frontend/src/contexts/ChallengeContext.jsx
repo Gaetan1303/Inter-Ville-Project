@@ -81,6 +81,33 @@ export const ChallengeProvider = ({ children }) => {
     }
   };
 
+  // fonction pour modifier un défi existant
+  const updateChallenge = async (id, payload) => {
+    try {
+      const res = await API.put(`/challenges/${id}`, payload);
+      // Mettre à jour la liste locale des défis
+      setChallenges((prev) =>
+        prev.map((c) => (c.id === id ? res.data.data : c))
+      );
+      return res.data.data;
+    } catch (err) {
+      console.error('Erreur lors de la modification du défi.', err);
+      throw err;
+    }
+  };
+
+  // fonction pour supprimer un défi
+  const deleteChallenge = async (id) => {
+    try {
+      await API.delete(`/challenges/${id}`);
+      // Retirer le défi de la liste locale
+      setChallenges((prev) => prev.filter((c) => c.id !== id));
+    } catch (err) {
+      console.error('Erreur lors de la suppression du défi.', err);
+      throw err;
+    }
+  };
+
  
   return (
     <ChallengeContext.Provider
@@ -93,7 +120,8 @@ export const ChallengeProvider = ({ children }) => {
         fetchChallengeById,
         fetchComments,
         postComment,
-        
+        updateChallenge,
+        deleteChallenge,
       }}
     >
       {children}

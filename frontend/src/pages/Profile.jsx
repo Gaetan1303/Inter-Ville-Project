@@ -7,9 +7,26 @@ import '../styles/Admin.css';
 export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { challenges } = useChallenges();
+  const { challenges, deleteChallenge } = useChallenges();
   const userChallenges = challenges.filter((c) => c.created_by === user?.id);
   console.log('User Challenges:', userChallenges);
+
+  // Fonction pour supprimer un challenge avec confirmation
+  const handleDelete = async (id, title) => {
+    if (window.confirm(`Etes-vous sur de vouloir supprimer le challenge "${title}" ?`)) {
+      try {
+        await deleteChallenge(id);
+        alert('Challenge supprime avec succes !');
+      } catch (err) {
+        alert('Erreur lors de la suppression du challenge.');
+      }
+    }
+  };
+
+  // Fonction pour rediriger vers la page de modification
+  const handleEdit = (id) => {
+    navigate(`/challenges/${id}/edit`);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -50,7 +67,7 @@ export default function Profile() {
           <div className={`stat-card ${user.is_validated ? '' : 'highlight'}`}>
             <div className="stat-label">Statut</div>
             <div className="stat-value" style={{ fontSize: '1.5em' }}>
-              {user.is_validated ? 'Validé' : 'En attente'}
+              {user.is_validated ? 'Valide' : 'En attente'}
             </div>
           </div>
         </div>
@@ -65,10 +82,11 @@ export default function Profile() {
               <tr>
                 <th>ID</th>
                 <th>Titre</th>
-                <th>Catégorie</th>
-                <th>Difficulté</th>
+                <th>Categorie</th>
+                <th>Difficulte</th>
                 <th>Statut</th>
-                <th>Date de création</th>
+                <th>Date de creation</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -84,12 +102,30 @@ export default function Profile() {
                   </td>
                   <td>{challenge.status}</td>
                   <td>{new Date(challenge.createdAt).toLocaleDateString('fr-FR')}</td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        className="action-btn edit-btn"
+                        onClick={() => handleEdit(challenge.id)}
+                        title="Modifier"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="action-btn delete-btn"
+                        onClick={() => handleDelete(challenge.id, challenge.title)}
+                        title="Supprimer"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
-          <p className="empty-message">Vous n'avez créé aucun challenge pour le moment.</p>
+          <p className="empty-message">Vous n'avez cree aucun challenge pour le moment.</p>
         )}
       </section>
     </div>
