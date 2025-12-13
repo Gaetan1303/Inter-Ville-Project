@@ -112,6 +112,7 @@ export default function Profile() {
                         Edit
                       </button>
                       <button
+                        
                         className="action-btn delete-btn"
                         onClick={() => handleDelete(challenge.id, challenge.title)}
                         title="Supprimer"

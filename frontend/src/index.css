@@ -199,6 +199,10 @@ button {
   letter-spacing: 0.01em;
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
+.action-btn.delete-btn{
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: #fff;
+}
 
 form button {
   margin-top: 4px;
