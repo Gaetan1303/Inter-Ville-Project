@@ -24,7 +24,7 @@ export const ChallengeProvider = ({ children }) => {
     fetchChallenges();
   }, []);
 
-  
+
   // fonction pour créer un nouveau défi
   const createChallenge = async (payload) => {
     try {
@@ -61,6 +61,22 @@ export const ChallengeProvider = ({ children }) => {
     }
   };
 
+// fonction pour poster un commentaire
+   const postComment = async ({
+    challengeId,    
+    content,    
+  }) => {
+    try {
+      const res = await API.post("/comments", {
+        challenge_id:challengeId,        
+        content,        
+      });
+      return res.data;
+    } catch (err) {
+      console.error("Erreur lors de la publication du commentaire.", err);
+    }
+  };
+
   return (
     <ChallengeContext.Provider
       value={{
@@ -71,6 +87,7 @@ export const ChallengeProvider = ({ children }) => {
         createChallenge,
         fetchChallengeById,
         fetchComments,
+        postComment,
       }}
     >
       {children}
