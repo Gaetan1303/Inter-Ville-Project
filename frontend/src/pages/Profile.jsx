@@ -83,7 +83,7 @@ export default function Profile() {
                     </span>
                   </td>
                   <td>{challenge.status}</td>
-                  <td>{new Date(challenge.created_at).toLocaleDateString('fr-FR')}</td>
+                  <td>{new Date(challenge.createdAt).toLocaleDateString('fr-FR')}</td>
                 </tr>
               ))}
             </tbody>
