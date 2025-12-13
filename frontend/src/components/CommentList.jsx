@@ -15,10 +15,24 @@ export default function CommentList({ challengeId }) {
     load();
   }, [challengeId]);
 
-  const load = async () => {
-    const data = await fetchComments(challengeId);
+ const load = async () => {
+  const data = await fetchComments(challengeId);
+  
+  // Vérifier si la structure a déjà les replies imbriquées
+  if (data.length > 0 && data[0].replies) {
+    // Structure déjà organisée (avec replies array)
     setComments(data);
-  };
+  } else {
+    // Structure plate avec parent_id → regrouper
+    const organized = data
+      .filter((c) => !c.parent_id)
+      .map((parent) => ({
+        ...parent,
+        replies: data.filter((c) => c.parent_id === parent.id),
+      }));
+    setComments(organized);
+  }
+};
 
 // appel a la creation de commentaire lors du submit
     const submit = async (e) => {
@@ -37,81 +51,99 @@ export default function CommentList({ challengeId }) {
 
  
 
-  // Organise les commentaires : racines et réponses
-  const rootComments = comments.filter((c) => !c.parentId);
-  const getChildren = (parentId) =>
-    comments.filter((c) => c.parentId === parentId);
-
   const renderComment = (comment, isReply = false) => (
     <li
       key={comment.id}
       className={`comment-item ${isReply ? "comment-reply" : ""}`}
     >
-      <div className="meta">
-        <strong>{comment.author?.first_name || "user#" + comment.userId}</strong> •{" "}
-        {new Date(comment.createdAt).toLocaleString()}
+      <div className="comment-card">
+        <div className="meta">
+          <strong>{comment.author?.first_name || "user#" + comment.user_id}</strong>
+          {comment.author?.promo && <span className="promo"> • {comment.author.promo}</span>}
+          {" "}
+          <span className="date">
+            {new Date(comment.createdAt).toLocaleDateString("fr-FR")}
+          </span>
+        </div>
+        <div className="content">{comment.content}</div>
+        <button
+          className="reply-btn"
+          onClick={() =>
+            setReplyingTo({
+              parentId: comment.id,
+              parentAuthor: comment.author?.first_name || "user#" + comment.user_id,
+            })
+          }
+        >
+          Répondre
+        </button>
+
+        {/* Inline reply form si c'est ce commentaire */}
+        {replyingTo?.parentId === comment.id && (
+          <form className="reply-form" onSubmit={async (e) => {
+            e.preventDefault();
+            if (!replyText.trim()) return;
+            await postComment({
+              challengeId,
+              content: replyText,
+              parent_id: comment.id,
+            });
+            // Recharger tous les commentaires pour avoir la structure complète
+            await load();
+            setReplyingTo(null);
+            setReplyText("");
+          }}>
+            <small className="reply-label">
+              Répondre à {replyingTo.parentAuthor}
+            </small>
+            <textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder="Écrire une réponse..."
+              required
+            />
+            <div className="reply-actions">
+              <button type="submit">Poster</button>
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={() => {
+                  setReplyingTo(null);
+                  setReplyText("");
+                }}
+              >
+                Annuler
+              </button>
+            </div>
+          </form>
+        )}
       </div>
-      <div className="content">{comment.content || comment.text}</div>
-      <button
-        className="reply-btn"
-        onClick={() =>
-          setReplyingTo({
-            parentId: comment.id,
-            parentAuthor: comment.author?.first_name  || "user#" + comment.userId,
-          })
-        }
-      >
-        Répondre
-      </button>
 
-      {/* Inline reply form si c'est ce commentaire */}
-      {replyingTo?.parentId === comment.id && (
-        <form className="reply-form" >
-          <small className="reply-label">
-            Répondre à {replyingTo.parentAuthor}
-          </small>
-          <textarea
-            value={replyText}
-            onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Écrire une réponse..."
-          />
-          <div className="reply-actions">
-            <button type="submit">Poster</button>
-            <button
-              type="button"
-              className="ghost-btn"
-              onClick={() => {
-                setReplyingTo(null);
-                setReplyText("");
-              }}
-            >
-              Annuler
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Affiche les réponses imbriquées */}
-      {getChildren(comment.id).length > 0 && (
+      {/* Affiche les réponses imbriquées (replies array) */}
+      {comment.replies && comment.replies.length > 0 && (
         <ul className="comments replies">
-          {getChildren(comment.id).map((reply) => renderComment(reply, true))}
+          {comment.replies.map((reply) => renderComment(reply, true))}
         </ul>
       )}
     </li>
   );
 
   return (
-    <div>
+    <div className="comment-section">
+      <h3>Commentaires</h3>
       <form onSubmit={submit} className="comment-form">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Écrire un commentaire..."
+          required
         />
-        <button type="submit">Poster</button>
+        <button type="submit" className="btn btn-primary">Poster</button>
       </form>
 
-      <ul className="comments">{rootComments.map((c) => renderComment(c))}</ul>
+      <ul className="comments">
+        {comments.map((c) => renderComment(c))}
+      </ul>
     </div>
   );
 }

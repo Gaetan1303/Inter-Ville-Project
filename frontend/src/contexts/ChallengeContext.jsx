@@ -64,12 +64,14 @@ export const ChallengeProvider = ({ children }) => {
 // fonction pour poster un commentaire
    const postComment = async ({
     challengeId,    
-    content,    
+    content,
+    parent_id,
   }) => {
     try {
       const res = await API.post("/comments", {
-        challenge_id:challengeId,        
-        content,        
+        challenge_id: challengeId,        
+        content,
+        parent_id: parent_id || null,
       });
       return res.data;
     } catch (err) {
