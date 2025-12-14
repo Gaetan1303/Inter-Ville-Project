@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ChallengeProvider } from './contexts/ChallengeContext';
 import { AdminProvider } from './contexts/AdminContext';
+import { CommentProvider } from './contexts/CommentContext';
 import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -29,6 +30,7 @@ export default function App() {
       <AuthProvider>
         <ChallengeProvider>
           <AdminProvider>
+            <CommentProvider>
             <Header />
             <main className="main">
               <Routes>
@@ -50,6 +52,7 @@ export default function App() {
                 <Route path="/profile" element={<Profile />} />
               </Routes>
             </main>
+            </CommentProvider>
           </AdminProvider>
         </ChallengeProvider>
       </AuthProvider>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useChallenges } from "../contexts/ChallengeContext";
+import { useComments } from "../contexts/CommentContext";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function CommentList({ challengeId }) {
-  const { fetchComments,postComment } = useChallenges();
+  const { fetchComments,postComment } = useComments();
   const { user } = useAuth();
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
@@ -47,8 +47,6 @@ export default function CommentList({ challengeId }) {
     await load();
     setText("");
   };
-
- 
 
   const renderComment = (comment, isReply = false) => (
     <li
