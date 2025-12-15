@@ -70,7 +70,7 @@ export default function Admin() {
   const handleDeleteChallenge = async (challengeId) => {
     try {
       // Optimistic update: retire du tableau avant l'appel API
-      const updatedChallenges = challenges.filter((defi) => defi.id !== challengeId);
+      const updatedChallenges = challenges?.filter((defi) => defi.id !== challengeId);
       setChallenges(updatedChallenges);
 
       // Appel API
