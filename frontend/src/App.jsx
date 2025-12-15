@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { SocketProvider } from './contexts/SocketContext';
 import { ChallengeProvider } from './contexts/ChallengeContext';
 import { AdminProvider } from './contexts/AdminContext';
 import { CommentProvider } from './contexts/CommentContext';
@@ -15,6 +16,7 @@ import ChallengeDetail from './pages/ChallengeDetail';
 import CreateChallenge from './pages/CreateChallenge';
 import EditChallenge from './pages/EditChallenge';
 import Admin from './pages/Admin';
+import ChatWidget from './components/ChatWidget';
 
 const ProtectedAdminRoute = ({ children }) => {
   const { user } = useAuth();
@@ -28,6 +30,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <SocketProvider>
         <ChallengeProvider>
           <AdminProvider>
             <CommentProvider>
@@ -52,9 +55,11 @@ export default function App() {
                 <Route path="/profile" element={<Profile />} />
               </Routes>
             </main>
-            </CommentProvider>
+             <ChatWidget />
+            </CommentProvider>              
           </AdminProvider>
         </ChallengeProvider>
+        </SocketProvider>
       </AuthProvider>
     </BrowserRouter>
   );
