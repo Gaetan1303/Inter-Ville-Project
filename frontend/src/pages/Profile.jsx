@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useChallenges } from '../contexts/ChallengeContext';
+import { useParticipation } from '../contexts/ParticipationContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Admin.css';
 
@@ -8,6 +9,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { challenges, deleteChallenge } = useChallenges();
+  const { participations, getUserParticipations, loading: participationLoading } = useParticipation();
   const userChallenges = challenges.filter((c) => c.created_by === user?.id);
   console.log('User Challenges:', userChallenges);
 
@@ -33,6 +35,20 @@ export default function Profile() {
       navigate('/login');
     }
   }, [user, navigate]);
+
+  // Charger les participations de l'utilisateur
+  useEffect(() => {
+    const loadParticipations = async () => {
+      if (user?.id) {
+        try {
+          await getUserParticipations(user.id);
+        } catch (err) {
+          console.error('Erreur lors du chargement des participations:', err);
+        }
+      }
+    };
+    loadParticipations();
+  }, [user?.id]);
 
   if (!user) {
     return null;
@@ -127,6 +143,59 @@ export default function Profile() {
           </table>
         ) : (
           <p className="empty-message">Vous n'avez cree aucun challenge pour le moment.</p>
+        )}
+      </section>
+
+      {/* Section Mes Participations */}
+      <section className="challenges-section">
+        <h2>Mes participations</h2>
+        {participationLoading && <p className="muted">Chargement des participations...</p>}
+        {!participationLoading && participations.length === 0 && (
+          <p className="empty-message">Aucune participation pour le moment.</p>
+        )}
+        {!participationLoading && participations.length > 0 && (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Challenge</th>
+                <th>Catégorie</th>
+                <th>Difficulté</th>
+                <th>Statut</th>
+                <th>Date d'inscription</th>
+              </tr>
+            </thead>
+            <tbody>
+              {participations.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.challenge_id}</td>
+                  <td>{p.challenge?.title || '—'}</td>
+                  <td>{p.challenge?.category || '—'}</td>
+                  <td>{p.challenge?.difficulty || '—'}</td>
+                  <td>
+                    <span 
+                      className={`status-badge status-${p.challenge?.status || 'unknown'}`}
+                      style={{
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        fontSize: '0.85em',
+                        fontWeight: '600',
+                        backgroundColor: 
+                          p.challenge?.status === 'active' ? '#10b981' :
+                          p.challenge?.status === 'completed' ? '#6366f1' :
+                          p.challenge?.status === 'pending' ? '#f59e0b' :
+                          '#64748b',
+                        color: '#fff'
+                      }}
+                    >
+                      {p.challenge?.status || '—'}
+                    </span>
+                  </td>
+                  <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString('fr-FR') : '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </section>
     </div>
