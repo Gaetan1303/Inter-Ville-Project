@@ -15,30 +15,30 @@ describe('Admin Integration Tests', () => {
     adminToken = loginResponse.body.token;
   });
 
-  it('should fetch pending users', async () => {
+  it('doit récupérer les utilisateurs en attente', async () => {
     const response = await request(app)
       .get('/admin/users/pending')
       .set('Authorization', `Bearer ${adminToken}`);
-
+    console.log('Réponse utilisateurs en attente:', response.status, response.body);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('data');
     expect(Array.isArray(response.body.data)).toBe(true);
   });
 
-  it('should validate a user', async () => {
+  it('doit valider un utilisateur', async () => {
     const response = await request(app)
       .put('/admin/users/1/validate')
       .set('Authorization', `Bearer ${adminToken}`);
-
+    console.log('Réponse validation utilisateur:', response.status, response.body);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('message', 'Utilisateur validé avec succès');
   });
 
-  it('should delete a challenge', async () => {
+  it('doit supprimer un challenge', async () => {
     const response = await request(app)
       .delete('/admin/challenges/1')
       .set('Authorization', `Bearer ${adminToken}`);
-
+    console.log('Réponse suppression challenge:', response.status, response.body);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('message', 'Challenge supprimé avec succès');
   });
