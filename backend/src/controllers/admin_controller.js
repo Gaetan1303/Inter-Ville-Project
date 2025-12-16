@@ -22,7 +22,7 @@ const get_pending_users = async (req, res) => {
     console.error("Erreur lors de la récupération des comptes en attente:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message
     });
   }
 };
@@ -69,7 +69,7 @@ const validate_user = async (req, res) => {
     console.error("Erreur lors de la validation de l'utilisateur:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message
     });
   }
 };
@@ -105,7 +105,7 @@ const delete_challenge = async (req, res) => {
     console.error("Erreur lors de la suppression du challenge:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message
     });
   }
 };
@@ -141,7 +141,7 @@ const delete_comment = async (req, res) => {
     console.error("Erreur lors de la suppression du commentaire:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message
     });
   }
 };
@@ -171,7 +171,7 @@ const get_stats = async (req, res) => {
     console.error("Erreur lors de la récupération des statistiques:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message
     });
   }
 };

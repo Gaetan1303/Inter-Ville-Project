@@ -5,4 +5,5 @@ module.exports = {
   moduleDirectories: ['node_modules'],
   moduleFileExtensions: ['js', 'json'],
   transform: {},
+  setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
 };

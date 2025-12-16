@@ -41,13 +41,36 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Helmet - Sécurise les headers HTTP
 app.use(helmet());
 
+
 // CORS - Autorise les requêtes cross-origin depuis le frontend
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    credentials: true,
-  })
-);
+if (process.env.NODE_ENV === "production") {
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+    })
+  );
+  console.log("[CORS] Mode production : origine autorisée =", process.env.FRONTEND_URL);
+} else {
+  app.use(
+    cors({
+      origin: [
+        process.env.FRONTEND_URL || "http://localhost:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:5173"
+      ],
+      credentials: true,
+    })
+  );
+  console.log("[CORS] Mode développement : origines autorisées multiples");
+}
+
+// Redirection HTTP vers le frontend en production (placeholder)
+if (process.env.NODE_ENV === "production") {
+  app.get("/", (req, res) => {
+    res.redirect(process.env.FRONTEND_URL || "/api-docs");
+  });
+}
 
 // Compression - Compresse les réponses HTTP
 app.use(compression());

@@ -1,6 +1,20 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const { generate_token, generate_refresh_token, verify_token } = require('../services/token_service');
+// Upload d'un avatar utilisateur
+const { saveUpload } = require('../services/upload_service');
+const uploadAvatar = (req, res) => {
+  try {
+    const { filename, data } = req.body;
+    if (!filename || !data) {
+      return res.status(400).json({ success: false, message: 'Paramètres manquants' });
+    }
+    const avatarPath = saveUpload(data, filename, 'avatars');
+    res.status(201).json({ success: true, avatar: avatarPath });
+  } catch (err) {
+    res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : err.message });
+  }
+};
 const { send_welcome_email, send_validation_email } = require('../services/email_service');
 
 /**
@@ -48,6 +62,7 @@ const register = async (req, res) => {
     }
 
     // Créer le nouvel utilisateur dans la base de données
+    // On force toujours le rôle à 'user', même si un champ role est envoyé dans la requête
     const user = await User.create({
       email,
       password,
@@ -55,8 +70,8 @@ const register = async (req, res) => {
       last_name,
       city,
       promo,
-      is_validated: false,  // Le compte nécessite une validation admin
-      role: 'user'          // Rôle par défaut
+      is_validated: false,
+      role: 'user'
     });
 
     // Envoyer l'email de bienvenue (asynchrone, ne bloque pas la réponse)
@@ -88,7 +103,7 @@ const register = async (req, res) => {
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({
         success: false,
-        message: error.errors[0]?.message || 'Erreur de validation des données',
+        message: process.env.NODE_ENV === 'production' ? 'Erreur de validation des données' : (error.errors[0]?.message || 'Erreur de validation des données'),
       });
     }
 
@@ -96,15 +111,14 @@ const register = async (req, res) => {
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(400).json({
         success: false,
-        message: 'Un compte avec cet email existe déjà'
+        message: process.env.NODE_ENV === 'production' ? 'Un compte avec cet email existe déjà' : 'Un compte avec cet email existe déjà'
       });
     }
 
     // Erreur générique du serveur
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de l\'inscription',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: process.env.NODE_ENV === 'production' ? "Erreur lors de l'inscription" : error.message
     });
   }
 };
@@ -134,7 +148,7 @@ const login = async (req, res) => {
     const user = await User.findOne({ where: { email } });
     // console.log supprimé (résultat recherche utilisateur)
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Identifiants invalides' });
     }
 
     // Vérifier le mot de passe
@@ -145,7 +159,7 @@ const login = async (req, res) => {
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     // console.log supprimé (résultat bcrypt)
     if (!isPasswordValid) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Identifiants invalides' });
     }
 
     // Vérifier si l'utilisateur est validé par un admin
@@ -174,7 +188,7 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.error('Erreur lors de la connexion:', error);
-    return res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+    return res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : 'Erreur interne du serveur' });
   }
 };
 
@@ -230,7 +244,7 @@ const get_me = async (req, res) => {
     console.error("Erreur lors de la récupération de l'utilisateur connecté:", error);
     res.status(500).json({
       success: false,
-      message: "Erreur serveur",
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message
     });
   }
 };
@@ -249,7 +263,7 @@ const refresh_token = async (req, res) => {
     // Vérifier si le refresh token est valide
     const decoded = verify_token(refreshToken);
     if (!decoded) {
-      return res.status(401).json({ success: false, message: 'Refresh token invalide ou expiré' });
+      return res.status(401).json({ success: false, message: 'Token invalide ou expiré' });
     }
 
     // Générer un nouveau token d'accès
@@ -264,7 +278,7 @@ const refresh_token = async (req, res) => {
     });
   } catch (error) {
     console.error('Erreur lors du rafraîchissement du token:', error);
-    return res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
+    return res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : 'Erreur interne du serveur' });
   }
 };
 
@@ -275,39 +289,6 @@ const refresh_token = async (req, res) => {
  * @param {Object} res - Objet de réponse Express
  * @returns {Object} Réponse JSON
  */
-const validate_user = async (req, res) => {
-  try {
-    const { userId } = req.body;
-
-    // Vérifier si l'utilisateur est un admin
-    const adminUser = await User.findByPk(req.user?.id); // Ajout de l'opérateur optionnel pour éviter les erreurs
-    if (!adminUser || adminUser.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Accès refusé : droits insuffisants' });
-    }
-
-    // Valider l'utilisateur
-    const userToValidate = await User.findByPk(userId);
-    if (!userToValidate) {
-      return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
-    }
-
-    userToValidate.is_validated = true;
-    await userToValidate.save();
-
-    // Envoyer un email de validation à l'utilisateur (non bloquant)
-    send_validation_email(userToValidate.email, userToValidate.first_name).catch(err => {
-      console.error('Erreur lors de l\'envoi de l\'email de validation:', err);
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'Utilisateur validé avec succès'
-    });
-  } catch (error) {
-    console.error('Erreur lors de la validation de l\'utilisateur:', error);
-    return res.status(500).json({ success: false, message: 'Erreur interne du serveur' });
-  }
-};
 
 module.exports = {
   register,
@@ -315,5 +296,5 @@ module.exports = {
   logout,
   get_me,
   refresh_token,
-  validate_user
+  uploadAvatar
 };

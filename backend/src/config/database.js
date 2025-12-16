@@ -15,8 +15,8 @@ const sequelize = new Sequelize(
     dialect: 'mysql',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
     pool: {
-      max: 5,           // Nombre maximum de connexions dans le pool
-      min: 0,           // Nombre minimum de connexions dans le pool
+      max: 10,          // Nombre maximum de connexions dans le pool (augmenté)
+      min: 2,           // Nombre minimum de connexions dans le pool (augmenté)
       acquire: 30000,   // Temps maximum (ms) pour obtenir une connexion
       idle: 10000       // Temps maximum (ms) qu'une connexion peut rester inactive
     },

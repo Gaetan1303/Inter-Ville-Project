@@ -82,7 +82,7 @@ const User = sequelize.define('User', {
      */
     beforeCreate: async (user) => {
       if (user.password) {
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(12); // Augmenté à 12 rounds
         user.password = await bcrypt.hash(user.password, salt);
       }
     },
@@ -92,7 +92,7 @@ const User = sequelize.define('User', {
      */
     beforeUpdate: async (user) => {
       if (user.changed('password')) {
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(12); // Augmenté à 12 rounds
         user.password = await bcrypt.hash(user.password, salt);
       }
     }

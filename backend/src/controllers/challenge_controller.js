@@ -1,11 +1,16 @@
 // Upload d'une image de challenge
+const { saveUpload } = require('../services/upload_service');
 exports.uploadChallengeImage = (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ success: false, message: 'Aucun fichier envoyé' });
+  try {
+    const { filename, data } = req.body;
+    if (!filename || !data) {
+      return res.status(400).json({ success: false, message: 'Paramètres manquants' });
+    }
+    const imagePath = saveUpload(data, filename, 'challenges');
+    res.status(201).json({ success: true, image: imagePath });
+  } catch (err) {
+    res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : err.message });
   }
-  // Retourne le chemin relatif à stocker dans la BDD
-  const imagePath = `/uploads/challenges/${req.file.filename}`;
-  res.status(201).json({ success: true, image: imagePath });
 };
 const Challenge = require('../models/Challenge');
 
@@ -16,7 +21,7 @@ exports.getChallenges = async (req, res) => {
     const challenges = await Challenge.findAll({ where: filters });
     res.status(200).json({ success: true, data: challenges });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message });
   }
 };
 
@@ -25,11 +30,11 @@ exports.getChallengeById = async (req, res) => {
   try {
     const challenge = await Challenge.findByPk(req.params.id);
     if (!challenge) {
-      return res.status(404).json({ success: false, message: 'Challenge not found' });
+      return res.status(404).json({ success: false, message: 'Challenge introuvable' });
     }
     res.status(200).json({ success: true, data: challenge });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message });
   }
 };
 
@@ -39,7 +44,7 @@ exports.createChallenge = async (req, res) => {
     const challenge = await Challenge.create(req.body);
     res.status(201).json({ success: true, data: challenge });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur de validation' : error.message });
   }
 };
 
@@ -48,12 +53,12 @@ exports.updateChallenge = async (req, res) => {
   try {
     const challenge = await Challenge.findByPk(req.params.id);
     if (!challenge) {
-      return res.status(404).json({ success: false, message: 'Challenge not found' });
+      return res.status(404).json({ success: false, message: 'Challenge introuvable' });
     }
     await challenge.update(req.body);
     res.status(200).json({ success: true, data: challenge });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur de validation' : error.message });
   }
 };
 
@@ -62,11 +67,11 @@ exports.deleteChallenge = async (req, res) => {
   try {
     const challenge = await Challenge.findByPk(req.params.id);
     if (!challenge) {
-      return res.status(404).json({ success: false, message: 'Challenge not found' });
+      return res.status(404).json({ success: false, message: 'Challenge introuvable' });
     }
     await challenge.destroy();
     res.status(200).json({ success: true, message: 'Challenge deleted successfully' });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message });
   }
 };

@@ -48,74 +48,55 @@ process.env.JWT_EXPIRE = '1h'; // 1 heure pour éviter les expirations rapides
 process.env.JWT_REFRESH_EXPIRE = '7d'; // 7 jours pour les tokens de rafraîchissement
 
 describe('Auth Integration Tests', () => {
-  it('should log in a user successfully', async () => {
-    // Correction du mot de passe envoyé dans la requête pour correspondre au mock
-    const password = bcrypt.hashSync('password123', 10); // Génération d'un hash valide pour le mot de passe
-    console.log('Mot de passe corrigé pour la requête:', password);
-
+  it('doit connecter un utilisateur avec succès', async () => {
     const response = await request(app)
       .post('/auth/login')
       .send({
         email: 'test@laplateforme.io',
-        password,
+        password: 'password123',
       });
-
-    console.log('Test: Réponse de connexion:', response.status, response.body);
-
-    const user = await User.findOne({ where: { email: 'test@laplateforme.io' } });
-    console.log('Test: Utilisateur récupéré depuis le mock:', user);
-
-    // Ajout de logs pour déboguer la comparaison statique
-    console.log('Mot de passe attendu dans le mock:', mockUser.password);
-    console.log('Mot de passe envoyé dans la requête:', password);
-
-    const isMatch = (password === mockUser.password);
-    console.log('Résultat de la comparaison statique:', isMatch);
-
-    expect(isMatch).toBe(true); // Ajout d'une vérification explicite
+    console.log('Réponse de connexion attendue:', response.status, response.body);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('success', true);
-    expect(response.body).toHaveProperty('message', 'Login successful');
+    expect(response.body).toHaveProperty('message', 'Connexion réussie');
     expect(response.body).toHaveProperty('token');
     expect(response.body).toHaveProperty('refreshToken');
   });
 
-  it('should fail to log in with invalid credentials', async () => {
+  it('doit échouer avec des identifiants invalides', async () => {
     const response = await request(app)
       .post('/auth/login')
       .send({
         email: 'invaliduser@example.com',
         password: 'wrongpassword',
       });
-
-    console.log('Test: Réponse pour des identifiants invalides:', response.status, response.body);
-
+    console.log('Réponse pour identifiants invalides:', response.status, response.body);
     expect(response.status).toBe(401);
     expect(response.body).toHaveProperty('success', false);
-    expect(response.body).toHaveProperty('message', 'Invalid credentials');
+    expect(response.body).toHaveProperty('message', 'Identifiants invalides');
   });
 
-  it('should fetch the authenticated user profile', async () => {
+  it('doit récupérer le profil utilisateur authentifié', async () => {
     const validToken = jwt.sign({ id: 1 }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     const profileResponse = await request(app)
       .get('/auth/me')
       .set('Authorization', `Bearer ${validToken}`);
-
+    console.log('Réponse profil utilisateur:', profileResponse.status, profileResponse.body);
     expect(profileResponse.status).toBe(200);
     expect(profileResponse.body).toHaveProperty('success', true);
-    expect(profileResponse.body.data).toHaveProperty('email', 'test@laplateforme.io'); // Suppression de 'user' dans l'accès
+    expect(profileResponse.body.data).toHaveProperty('user');
+    expect(profileResponse.body.data.user).toHaveProperty('email', 'test@laplateforme.io');
   });
 
   describe('Auth Integration Tests - Cas limites', () => {
-    it('should fail to fetch profile with an invalid token', async () => {
+    it('doit échouer à récupérer le profil avec un token invalide', async () => {
       const response = await request(app)
         .get('/auth/me')
         .set('Authorization', 'Bearer invalidtoken');
-
+      console.log('Réponse profil avec token invalide:', response.status, response.body);
       expect(response.status).toBe(401);
       expect(response.body).toHaveProperty('success', false);
-      expect(response.body).toHaveProperty('message', 'Invalid token');
+      expect(response.body).toHaveProperty('message', 'Token invalide');
     });
 
     it('should fail to fetch profile with an expired token', async () => {

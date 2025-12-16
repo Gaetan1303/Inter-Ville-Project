@@ -29,7 +29,10 @@ exports.getCommentsByChallenge = async (req, res) => {
     res.json(comments);
   } catch (err) {
     console.error('[GET] Erreur récupération commentaires:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      success: false,
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : err.message
+    });
   }
 };
 
@@ -41,7 +44,10 @@ exports.addComment = async (req, res) => {
     const comment = await Comment.create({ content, challenge_id, user_id, parent_id: parent_id || null });
     res.status(201).json(comment);
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    res.status(400).json({
+      success: false,
+      message: process.env.NODE_ENV === 'production' ? 'Erreur de validation' : err.message
+    });
   }
 };
 
@@ -64,6 +70,9 @@ exports.deleteComment = async (req, res) => {
     res.json({ message: 'Commentaire supprimé' });
   } catch (err) {
     console.error('[DELETE] Erreur suppression commentaire:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({
+      success: false,
+      message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : err.message
+    });
   }
 };
