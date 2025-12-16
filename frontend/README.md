@@ -1,16 +1,93 @@
-# React + Vite
+# Inter‑Ville Project • Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Ce frontend React pilote l’application Inter‑Ville (défis, commentaires, profil, admin). Il utilise Vite, un proxy de dev pour éviter le CORS, et une architecture Context API pour l’auth, les défis et l’admin.
 
-Currently, two official plugins are available:
+## Prérequis
+- Node 18+ recommandé
+- Backend démarré sur `http://localhost:5000`
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Installation
+```bash
+cd frontend
+npm install
+```
 
-## React Compiler
+## Démarrage en développement
+```bash
+npm run dev
+```
+Ouvre ensuite l’UI sur `http://localhost:5173`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Proxy Vite (anti‑CORS)
+Le fichier `vite.config.js` redirige les appels `\u002Fapi` vers `http://localhost:5000`.
+- Frontend appelle `\u002Fapi\u002F...`
+- Vite proxy -> Backend `http://localhost:5000`
 
-## Expanding the ESLint configuration
+L’instance Axios pointe par défaut sur `\u002Fapi` (voir `src/api/axiosInstance.js`). En production, définissez `VITE_API_BASE_URL` pour bypasser le proxy et cibler l’API réelle.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+# Exemple build prod (avec URL API distante)
+VITE_API_BASE_URL=https://api.example.com npm run build
+```
+
+## Architecture
+```
+src/
+	api/axiosInstance.js      # Axios + header Authorization + baseURL /api
+	components/
+		CommentList.jsx         # Liste + réponses imbriquées, post + rechargement
+		ChallengeCard.jsx, header.jsx
+	contexts/
+		AuthContext.jsx         # Auth, user, tokens
+		ChallengeContext.jsx    # CRUD défis + commentaires
+		AdminContext.jsx        # Admin (stats, validation, suppression)
+	pages/
+		Home.jsx                # Accueil
+		Challenges.jsx          # Liste des défis
+		ChallengeDetail.jsx     # Détail avec barre de progression (dates)
+		CreateChallenge.jsx     # Création de défi
+		EditChallenge.jsx       # Édition d’un défi (prérempli)
+		Profile.jsx             # Profil + mes défis + actions Edit/Suppr
+		Login.jsx, Register.jsx, Admin.jsx
+	App.jsx                   # Routes et ProtectedAdminRoute
+	index.css                 # Thème néon/dark global
+```
+
+## Fonctionnalités clés (étapes réalisées)
+- Auth persistante (tokens) et header `Authorization` injecté automatiquement.
+- Protection admin via `ProtectedAdminRoute`.
+- Défis: création, édition (préremplie), suppression depuis le Profil.
+- Détail défi: barre de progression moderne (début/fin) et statut (À venir/En cours/Terminé).
+- Commentaires: affichage hiérarchique (réponses) et rechargement après post pour avoir l’`author.first_name` immédiatement.
+- Proxy Vite: appels `\u002Fapi` sans CORS en dev.
+
+## Routes UI
+- `/` Accueil
+- `/Challenges` Liste des défis
+- `/Challenge/:id` Détail d’un défi
+- `/create` Créer un défi
+- `/challenges/:id/edit` Éditer un défi
+- `/profile` Mon profil (mes défis + actions)
+- `/admin` Admin (protégé, rôle admin)
+
+## Flux Défis (ChallengeContext)
+- `fetchChallenges()` charge la liste initiale.
+- `createChallenge(payload)` crée et préprend le défi.
+- `fetchChallengeById(id)` retourne un défi.
+- `updateChallenge(id, payload)` met à jour localement après PUT.
+- `deleteChallenge(id)` supprime localement après DELETE.
+- `fetchComments(challengeId)` récupère les commentaires.
+- `postComment({ challengeId, content, parent_id, user_id })` publie et on recharge pour afficher l’auteur.
+
+## Conseils production
+- Définir `VITE_API_BASE_URL` vers l’API de prod.
+- Ajuster le CORS côté backend pour votre domaine de prod.
+- Désactiver ou protéger la doc Swagger côté backend en prod.
+
+## Dépannage rapide
+- CORS en dev: vérifier que vous appelez `\u002Fapi` et que Vite est lancé.
+- 404 API: s’assurer que le backend écoute sur `http://localhost:5000`.
+- Auth: vérifier que le token est présent dans `localStorage` et que les routes nécessitant auth renvoient 401 si non connecté.
+
+---
+Inter‑Ville Project • Frontend
