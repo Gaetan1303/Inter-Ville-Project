@@ -66,7 +66,7 @@ exports.getParticipationsByUser = async (req, res) => {
     console.log('[Participation] Récupération des participations pour user:', userId);
     const participations = await Participation.findAll({
       where: { user_id: userId },
-      include: [{ model: Challenge }]
+      include: [{ model: Challenge, as: 'challenge' }]
     });
     res.status(200).json({ success: true, data: participations });
   } catch (err) {
@@ -81,11 +81,11 @@ exports.getParticipationsByUser = async (req, res) => {
 // Participations à un challenge
 exports.getParticipationsByChallenge = async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log('[Participation] Récupération des participations pour challenge:', id);
+    const { challengeId } = req.params;
+    console.log('[Participation] Récupération des participations pour challenge:', challengeId);
     const participations = await Participation.findAll({
-      where: { challenge_id: id },
-      include: [{ model: User, attributes: { exclude: ['password'] } }]
+      where: { challenge_id: challengeId },
+      include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } }]
     });
     res.status(200).json({ success: true, data: participations });
   } catch (err) {

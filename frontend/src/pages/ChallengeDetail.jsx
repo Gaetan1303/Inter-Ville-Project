@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useChallenges } from '../contexts/ChallengeContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useParticipation } from '../contexts/ParticipationContext';
 import CommentList from '../components/CommentList';
 
 export default function ChallengePage() {
   const { id } = useParams();
   const { fetchChallengeById } = useChallenges();
+  const { user } = useAuth();
+  const { createParticipation, getChallengeParticipations, loading } = useParticipation();
   const [challenge, setChallenge] = useState(null);
+  const [isParticipating, setIsParticipating] = useState(false);
+  const [participantCount, setParticipantCount] = useState(0);
 
   // Utilitaires pour afficher la progression entre start/end
   const computeProgress = (startDate, endDate) => {
@@ -40,11 +46,42 @@ export default function ChallengePage() {
   
   const load = async () => {
     try {
-      // appel de la fonction fetchChallengeById du contexte
+      // Charger le challenge
       const data = await fetchChallengeById(id);
       setChallenge(data);
+      
+      // Charger les participations
+      const participants = await getChallengeParticipations(id);
+      setParticipantCount(participants.length);
+      
+      // Verifier si l'utilisateur participe deja
+      if (user) {
+        const userParticipates = participants.some((p) => p.user_id === user.id);
+        setIsParticipating(userParticipates);
+      }
     } catch {
       console.error('Erreur lors du chargement du défi.');
+    }
+  };
+
+  // Handler pour participer au challenge
+  const handleParticipate = async () => {
+    if (!user) {
+      alert('Connecte-toi pour participer a ce challenge');
+      return;
+    }
+    if (isParticipating) {
+      alert('Tu participes deja a ce challenge !');
+      return;
+    }
+    try {
+      await createParticipation(id, user.id);
+      setIsParticipating(true);
+      setParticipantCount((prev) => prev + 1);
+      alert('Participation enregistree avec succes !');
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Erreur lors de la participation';
+      alert(msg);
     }
   };
 
@@ -89,8 +126,15 @@ export default function ChallengePage() {
 
     
 
-        <div style={{ marginTop: '12px' }}>
-          <button>Participer</button>
+        <div style={{ marginTop: '12px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <button 
+            onClick={handleParticipate} 
+            disabled={loading || isParticipating}
+            style={{ opacity: isParticipating ? 0.6 : 1 }}
+          >
+            {isParticipating ? 'Deja inscrit' : 'Participer'}
+          </button>
+          <span className="muted">{participantCount} participant{participantCount > 1 ? 's' : ''}</span>
         </div>
       </article>
 

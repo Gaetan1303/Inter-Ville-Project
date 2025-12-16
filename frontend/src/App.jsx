@@ -5,6 +5,7 @@ import { SocketProvider } from './contexts/SocketContext';
 import { ChallengeProvider } from './contexts/ChallengeContext';
 import { AdminProvider } from './contexts/AdminContext';
 import { CommentProvider } from './contexts/CommentContext';
+import { ParticipationProvider } from './contexts/ParticipationContext';
 import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -34,7 +35,8 @@ export default function App() {
         <ChallengeProvider>
           <AdminProvider>
             <CommentProvider>
-            <Header />
+              <ParticipationProvider>
+                <Header />
             <main className="main">
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -55,7 +57,8 @@ export default function App() {
                 <Route path="/profile" element={<Profile />} />
               </Routes>
             </main>
-             <ChatWidget />
+                <ChatWidget />
+              </ParticipationProvider>
             </CommentProvider>              
           </AdminProvider>
         </ChallengeProvider>
