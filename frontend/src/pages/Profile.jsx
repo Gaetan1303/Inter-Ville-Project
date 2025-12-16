@@ -9,7 +9,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { challenges, deleteChallenge } = useChallenges();
-  const { participations, getUserParticipations, loading: participationLoading } = useParticipation();
+  const { participations, getUserParticipations, deleteParticipation, loading: participationLoading } = useParticipation();
   const userChallenges = challenges.filter((c) => c.created_by === user?.id);
   console.log('User Challenges:', userChallenges);
 
@@ -21,6 +21,18 @@ export default function Profile() {
         alert('Challenge supprime avec succes !');
       } catch (err) {
         alert('Erreur lors de la suppression du challenge.');
+      }
+    }
+  };
+
+  // Fonction pour se desister d'une participation
+  const handleDeleteParticipation = async (participationId, challengeTitle) => {
+    if (window.confirm(`Voulez-vous vraiment vous desister du challenge "${challengeTitle}" ?`)) {
+      try {
+        await deleteParticipation(participationId);
+        alert('Participation supprimee avec succes !');
+      } catch (err) {
+        alert('Erreur lors de la suppression de la participation.');
       }
     }
   };
@@ -163,6 +175,7 @@ export default function Profile() {
                 <th>Difficulté</th>
                 <th>Statut</th>
                 <th>Date d'inscription</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -192,6 +205,15 @@ export default function Profile() {
                     </span>
                   </td>
                   <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString('fr-FR') : '—'}</td>
+                  <td>
+                    <button
+                      className="action-btn delete-btn"
+                      onClick={() => handleDeleteParticipation(p.id, p.challenge?.title || 'ce challenge')}
+                      title="Se desister"
+                    >
+                      Se desister
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
