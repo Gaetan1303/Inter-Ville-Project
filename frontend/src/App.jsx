@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { SocketProvider } from './contexts/SocketContext';
 import { ChallengeProvider } from './contexts/ChallengeContext';
 import { AdminProvider } from './contexts/AdminContext';
+import { CommentProvider } from './contexts/CommentContext';
 import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,6 +14,7 @@ import Profile from './pages/Profile';
 import Challenges from './pages/Challenges';
 import ChallengeDetail from './pages/ChallengeDetail';
 import CreateChallenge from './pages/CreateChallenge';
+import EditChallenge from './pages/EditChallenge';
 import Admin from './pages/Admin';
 import ChatWidget from './components/ChatWidget';
 
@@ -31,12 +33,14 @@ export default function App() {
         <SocketProvider>
         <ChallengeProvider>
           <AdminProvider>
+            <CommentProvider>
             <Header />
             <main className="main">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/Challenges" element={<Challenges />} />
                 <Route path="/Challenge/:id" element={<ChallengeDetail />} />
+                <Route path="/challenges/:id/edit" element={<EditChallenge />} />
                 <Route path="/create" element={<CreateChallenge />} />
                 <Route
                   path="/admin"
@@ -51,7 +55,8 @@ export default function App() {
                 <Route path="/profile" element={<Profile />} />
               </Routes>
             </main>
-              <ChatWidget />
+             <ChatWidget />
+            </CommentProvider>              
           </AdminProvider>
         </ChallengeProvider>
         </SocketProvider>

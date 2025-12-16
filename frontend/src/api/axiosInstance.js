@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Vite exposes env vars on import.meta.env (process.env is undefined in browser)
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+// Use dev proxy via Vite: frontend calls /api -> proxied to backend
+const baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const API = axios.create({
   baseURL,

@@ -199,6 +199,10 @@ button {
   letter-spacing: 0.01em;
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
+.action-btn.delete-btn{
+  background: linear-gradient(135deg, #dc3545, #c82333);
+  color: #fff;
+}
 
 form button {
   margin-top: 4px;
@@ -390,6 +394,55 @@ button:hover {
   border-radius: 14px;
   margin-top: 10px;
   border: 1px solid var(--stroke);
+}
+
+.timeline-card {
+  margin: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(135deg, rgba(60, 240, 197, 0.08), rgba(255, 138, 84, 0.05));
+}
+
+.timeline-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.timeline-status {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--stroke);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.progress-shell {
+  margin-top: 10px;
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--stroke);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 20px rgba(60, 240, 197, 0.35);
+  transition: width 220ms ease;
+}
+
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-weight: 600;
 }
 
 /* ============================================
