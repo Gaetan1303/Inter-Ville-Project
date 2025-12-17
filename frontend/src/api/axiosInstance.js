@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use dev proxy via Vite: frontend calls /api -> proxied to backend
-const baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Use direct backend URL for Kubernetes/port-forward setup
+const baseURL = 'http://localhost:5000';
 
 const API = axios.create({
   baseURL,
