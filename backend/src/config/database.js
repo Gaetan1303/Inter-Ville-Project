@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+const redis = require('redis');
 require('dotenv').config();
 
 /**
@@ -21,8 +22,8 @@ const sequelize = new Sequelize(
       idle: 10000       // Temps maximum (ms) qu'une connexion peut rester inactive
     },
     define: {
-      timestamps: true,        // Ajoute automatiquement createdAt et updatedAt
-      underscored: false,      // Utilise camelCase au lieu de snake_case
+      timestamps: false,       // Désactivé globalement - chaque modèle gère ses timestamps
+      underscored: false,      // Désactivé - chaque modèle spécifie sa convention
       freezeTableName: true    // Empêche Sequelize de pluraliser les noms de tables
     }
   }
@@ -43,6 +44,15 @@ const test_connection = async () => {
   }
 };
 
-// Suppression des journaux pour éviter d'exposer les informations sensibles
+// Configuration de la connexion Redis
+const redisClient = redis.createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
+});
 
-module.exports = { sequelize, test_connection };
+redisClient.on('error', (err) => {
+  console.error('Erreur de connexion à Redis:', err);
+});
+
+redisClient.connect();
+
+module.exports = { sequelize, test_connection, redisClient };

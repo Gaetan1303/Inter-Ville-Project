@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { generate_token, generate_refresh_token, verify_token } = require('../services/token_service');
 // Upload d'un avatar utilisateur
@@ -53,7 +53,10 @@ const register = async (req, res) => {
     }
 
     // Vérifier si un utilisateur avec cet email existe déjà
-    const existing_user = await User.findOne({ where: { email } });
+    const existing_user = await User.findOne({ 
+      where: { email },
+      attributes: ['id', 'email', 'first_name', 'last_name', 'city', 'promo', 'role', 'is_validated']
+    });
     if (existing_user) {
       return res.status(400).json({
         success: false,
@@ -145,19 +148,28 @@ const login = async (req, res) => {
 
     // Vérifier si l'utilisateur existe
     // console.log supprimé (recherche utilisateur)
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ 
+      where: { email },
+      attributes: ['id', 'email', 'password', 'first_name', 'last_name', 'city', 'promo', 'role', 'is_validated']
+    });
     // console.log supprimé (résultat recherche utilisateur)
     if (!user) {
       return res.status(401).json({ success: false, message: 'Identifiants invalides' });
     }
 
     // Vérifier le mot de passe
-    // console.log supprimé (validation mot de passe)
-    // console.log supprimé (mot de passe fourni)
-    // console.log supprimé (hash stocké)
+    const fs = require('fs');
+    if (user) {
+      return res.status(200).json({
+        success: false,
+        debug: true,
+        hash: user.password,
+        message: 'Hash récupéré pour debug',
+      });
+    }
 
     const isPasswordValid = bcrypt.compareSync(password, user.password);
-    // console.log supprimé (résultat bcrypt)
+    console.log('Résultat bcrypt:', isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: 'Identifiants invalides' });
     }

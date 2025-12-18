@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:latest
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: root_password
+        - name: MYSQL_DATABASE
+          value: cdpi_network
+        - name: MYSQL_USER
+          value: cdpi_network_user
+        - name: MYSQL_PASSWORD
+          value: cdpi_network_password
+        volumeMounts:
+        - name: initdb
+          mountPath: /docker-entrypoint-initdb.d/
+          readOnly: true
+      volumes:
+      - name: initdb
+        configMap:
+          name: mysql-initdb-config

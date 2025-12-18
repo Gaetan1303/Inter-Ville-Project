@@ -51,6 +51,11 @@ const Message = sequelize.define('Message', {
     defaultValue: false,
     allowNull: false,
     comment: 'Indique si le message a été lu par le destinataire'
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW
   }
 }, {
   tableName: 'messages',

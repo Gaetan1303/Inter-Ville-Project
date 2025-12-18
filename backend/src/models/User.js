@@ -71,10 +71,23 @@ const User = sequelize.define('User', {
     defaultValue: false,
     allowNull: false,
     comment: 'Indique si le compte a été validé par un admin'
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+    comment: 'Date de création du compte'
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+    comment: 'Date de dernière mise à jour'
   }
 }, {
   tableName: 'users',
-  timestamps: true,
+  timestamps: false,
+  underscored: true,  // Cette table utilise snake_case
   hooks: {
     /**
      * Hook avant création - Hash le mot de passe avant de sauvegarder

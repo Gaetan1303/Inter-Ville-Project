@@ -175,11 +175,11 @@ NODE_ENV=development
 PORT=5000
 
 # Configuration de la base de données MySQL
-DB_HOST=localhost
+DB_HOST=mysql
 DB_PORT=3306
 DB_NAME=cdpi_network
-DB_USER=cdpi_user
-DB_PASSWORD=cdpi_password
+DB_USER=cdpi_network_user
+DB_PASSWORD=cdpi_network_password
 
 # Configuration JWT
 JWT_SECRET=909090909090909090909090909090909090909090909090909090909090
@@ -206,4 +206,4 @@ ADMIN_EMAIL=admin@laplateforme.io
 ---
 
 ## Conclusion
-El miminette a encore frappé ! 
+El miminette a encore frappé !

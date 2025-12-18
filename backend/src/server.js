@@ -39,12 +39,12 @@ const start_server = async () => {
     await test_connection();
     
     // Synchroniser les modèles avec la base de données
-    // { alter: true } met à jour la structure sans supprimer les données
-    await sequelize.sync({ alter: true });
+    // Sans option, crée les tables si elles n'existent pas
+    await sequelize.sync();
     // console.log supprimé (synchronisation modèles)
     
     // Démarrer le serveur HTTP avec Socket.IO
-    server.listen(PORT, () => {
+    server.listen(PORT, '0.0.0.0', () => {
       // console.log supprimé (bannière serveur)
       // console.log supprimé (serveur démarré)
       // console.log supprimé (environnement)
