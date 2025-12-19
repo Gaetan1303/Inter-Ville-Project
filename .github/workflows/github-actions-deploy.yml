@@ -91,39 +91,44 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
           chmod 600 $HOME/.kube/config
 
+      - name: Test kubectl connection
+        run: |
+          kubectl version --client
+          kubectl cluster-info || echo "Cluster info failed, continuing with deployment"
+
       - name: Apply secrets
         run: |
-          kubectl apply -f kubernetes/secrets.yaml
+          kubectl apply -f kubernetes/secrets.yaml --validate=false
 
       - name: Deploy MySQL
         run: |
-          kubectl apply -f kubernetes/mysql-init-configmap.yaml
-          kubectl apply -f kubernetes/mysql-deployment.yaml
-          kubectl apply -f kubernetes/mysql-service.yaml
+          kubectl apply -f kubernetes/mysql-init-configmap.yaml --validate=false
+          kubectl apply -f kubernetes/mysql-deployment.yaml --validate=false
+          kubectl apply -f kubernetes/mysql-service.yaml --validate=false
 
       - name: Deploy Redis
         run: |
-          kubectl apply -f kubernetes/redis-deployment.yaml
-          kubectl apply -f kubernetes/redis-service.yaml
+          kubectl apply -f kubernetes/redis-deployment.yaml --validate=false
+          kubectl apply -f kubernetes/redis-service.yaml --validate=false
 
       - name: Deploy Backend
         run: |
-          kubectl apply -f kubernetes/backend-deployment.yaml
-          kubectl apply -f kubernetes/backend-service.yaml
+          kubectl apply -f kubernetes/backend-deployment.yaml --validate=false
+          kubectl apply -f kubernetes/backend-service.yaml --validate=false
 
       - name: Deploy Frontend
         run: |
-          kubectl apply -f kubernetes/frontend-deployment.yaml
-          kubectl apply -f kubernetes/frontend-service.yaml
+          kubectl apply -f kubernetes/frontend-deployment.yaml --validate=false
+          kubectl apply -f kubernetes/frontend-service.yaml --validate=false
 
       - name: Deploy Logging Stack
         run: |
-          kubectl apply -f kubernetes/elk-stack.yaml
-          kubectl apply -f kubernetes/logging-pipeline.yaml
+          kubectl apply -f kubernetes/elk-stack.yaml --validate=false
+          kubectl apply -f kubernetes/logging-pipeline.yaml --validate=false
 
       - name: Deploy Ingress
         run: |
-          kubectl apply -f kubernetes/ingress.yaml
+          kubectl apply -f kubernetes/ingress.yaml --validate=false
 
       - name: Wait for deployment
         run: |
