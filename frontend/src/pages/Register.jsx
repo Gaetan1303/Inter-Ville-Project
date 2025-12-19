@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useToastContext } from "../contexts/ToastContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   const { register } = useAuth();
+  const { showToast } = useToastContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -23,12 +25,13 @@ export default function Register() {
         city,
         promo,
       });
-      alert(
-        "Inscription enregistrée. Vérifie ton e-mail. Compte en attente de validation."
+      showToast(
+        "Inscription enregistrée. Vérifie ton e-mail. Compte en attente de validation.",
+        "success"
       );
       navigate("/login");
     } catch (err) {
-      alert(err.message || "Erreur inscription");
+      showToast(err.message || "Erreur inscription", "error");
     }
   };
 

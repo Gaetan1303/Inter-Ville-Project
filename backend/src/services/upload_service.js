@@ -22,11 +22,11 @@ function saveUpload(base64OrBuffer, filename, folder) {
     const destDir = path.join(__dirname, '../../uploads', folder);
     if (!fs.existsSync(destDir)) {
       fs.mkdirSync(destDir, { recursive: true });
-      console.log(`[UPLOAD] Dossier créé : ${destDir}`);
+      // Log supprimé pour la production
     }
     const dest = path.join(destDir, filename);
     fs.writeFileSync(dest, fileData);
-    console.log(`[UPLOAD] Fichier sauvegardé : ${dest}`);
+    // Log supprimé pour la production
     return `/uploads/${folder}/${filename}`;
   } catch (error) {
     console.error('[UPLOAD] Erreur lors de la sauvegarde du fichier :', error.message);

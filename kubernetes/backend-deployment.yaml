@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: backend
-        image: cdpi-backend:latest
-        imagePullPolicy: IfNotPresent
+        image: inter-ville-backend:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5000
         env:
@@ -35,4 +35,4 @@ spec:
         - name: NODE_ENV
           value: development
         - name: FRONTEND_URL
-          value: http://localhost:3000
+          value: http://localhost:5173

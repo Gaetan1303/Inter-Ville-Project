@@ -159,7 +159,7 @@ const login = async (req, res) => {
 
     // Vérifier le mot de passe
     const isPasswordValid = bcrypt.compareSync(password, user.password);
-    console.log('Résultat bcrypt:', isPasswordValid);
+    // Log supprimé pour la production
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, message: 'Identifiants invalides' });
     }

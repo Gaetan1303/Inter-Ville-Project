@@ -2,11 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useChallenges } from '../contexts/ChallengeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToastContext } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const { challenges } = useChallenges();
   const { user } = useAuth();
+  const { showToast } = useToastContext();
   const navigate = useNavigate();
 
   const challengeActive = challenges?.filter((c) => c.status === 'active');
@@ -30,8 +32,8 @@ export default function Home() {
             <button
               onClick={() => {
                 if (disabled) {
-                  navigate('/');
-                  alert('vous devez vous connecter pour creer un challenge');
+                  showToast('Vous devez vous connecter pour créer un challenge', 'warning');
+                  navigate('/login');
                   return;
                 } else {
                   navigate('/create');

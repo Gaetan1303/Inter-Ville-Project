@@ -9,7 +9,7 @@ const connectedUsers = new Map();
 
 const initializeSocketHandlers = (io) => {
   io.on('connection', (socket) => {
-    console.log(` Client connecté: ${socket.id}`);
+    // Log supprimé pour la production
     
     // Événement: Un utilisateur rejoint le chat
     socket.on('user:join', (userData) => {
@@ -30,12 +30,12 @@ const initializeSocketHandlers = (io) => {
       // Notifier les autres utilisateurs qu'un nouvel utilisateur s'est connecté
       socket.broadcast.emit('user:connected', userInfo);
       
-      console.log(` Utilisateur connecté: ${userData.userName} (${userData.userId})`);
+      // Log supprimé pour la production
     });
     
     // Événement: Envoi de message
     socket.on('message', (data) => {
-      console.log(' Message reçu:', data);
+      // Log supprimé pour la production
       
       // Ajouter un timestamp si absent
       if (!data.timestamp) {
@@ -59,7 +59,7 @@ const initializeSocketHandlers = (io) => {
         // Notifier les autres utilisateurs qu'un utilisateur s'est déconnecté
         socket.broadcast.emit('user:disconnected', userInfo.userId);
         
-        console.log(` Utilisateur déconnecté: ${userInfo.userName} (${userInfo.userId})`);
+        // Log supprimé pour la production
       }
     });
     
@@ -76,9 +76,9 @@ const initializeSocketHandlers = (io) => {
         // Notifier les autres utilisateurs qu'un utilisateur s'est déconnecté
         socket.broadcast.emit('user:disconnected', userInfo.userId);
         
-        console.log(` Client déconnecté: ${userInfo.userName} (${userInfo.userId})`);
+        // Log supprimé pour la production
       } else {
-        console.log(` Client déconnecté: ${socket.id}`);
+        // Log supprimé pour la production
       }
     });
   });

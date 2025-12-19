@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useToastContext } from "../contexts/ToastContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const { login } = useAuth();
+  const { showToast } = useToastContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -12,9 +14,10 @@ export default function Login() {
     e.preventDefault();
     try {
       await login(email, password);
+      showToast("Connexion réussie !", "success");
       navigate("/");
     } catch (err) {
-      alert(err.message || "Erreur connexion");
+      showToast(err.message || "Erreur connexion", "error");
     }
   };
 

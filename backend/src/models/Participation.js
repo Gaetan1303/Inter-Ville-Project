@@ -77,4 +77,11 @@ const Participation = sequelize.define('Participation', {
   ]
 });
 
+Participation.associate = (models) => {
+  Participation.belongsTo(models.Challenge, {
+    foreignKey: 'challenge_id',
+    as: 'challenge',
+  });
+};
+
 module.exports = Participation;

@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Challenge = require('../models/Challenge');
 const Comment = require('../models/Comment');
+const Participation = require('../models/Participation');
 const { send_validation_email } = require('../services/email_service');
 
 /**
@@ -155,9 +156,14 @@ const delete_comment = async (req, res) => {
  */
 const get_stats = async (req, res) => {
   try {
-    const userCount = await User.count();
-    const challengeCount = await Challenge.count();
-    const commentCount = await Comment.count();
+    const [userCount, challengeCount, commentCount, participationCount, validatedUsers, activeUsers] = await Promise.all([
+      User.count(),
+      Challenge.count(),
+      Comment.count(),
+      Participation.count(),
+      User.count({ where: { is_validated: true } }),
+      User.count({ where: { is_validated: true, role: 'user' } })
+    ]);
 
     res.status(200).json({
       success: true,
@@ -165,10 +171,13 @@ const get_stats = async (req, res) => {
         users: userCount,
         challenges: challengeCount,
         comments: commentCount,
+        participations: participationCount,
+        validatedUsers: validatedUsers,
+        activeUsers: activeUsers
       },
     });
   } catch (error) {
-    console.error("Erreur lors de la récupération des statistiques:", error);
+    // Log supprimé pour la production
     res.status(500).json({
       success: false,
       message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useChallenges } from '../contexts/ChallengeContext';
+import { useToastContext } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Admin.css';
 
@@ -8,17 +9,18 @@ export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { challenges, deleteChallenge } = useChallenges();
+  const { showToast } = useToastContext();
   const userChallenges = challenges.filter((c) => c.created_by === user?.id);
-  console.log('User Challenges:', userChallenges);
+  // Log supprimé pour la production
 
   // Fonction pour supprimer un challenge avec confirmation
   const handleDelete = async (id, title) => {
     if (window.confirm(`Etes-vous sur de vouloir supprimer le challenge "${title}" ?`)) {
       try {
         await deleteChallenge(id);
-        alert('Challenge supprime avec succes !');
+        showToast('Challenge supprimé avec succès !', 'success');
       } catch (err) {
-        alert('Erreur lors de la suppression du challenge.');
+        showToast('Erreur lors de la suppression du challenge.', 'error');
       }
     }
   };

@@ -44,15 +44,9 @@ const test_connection = async () => {
   }
 };
 
-// Configuration de la connexion Redis
-const redisClient = redis.createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
-});
+// Configuration de la connexion Redis - DÉSACTIVÉ TEMPORAIREMENT
+console.log('Redis désactivé temporairement pour diagnostic');
 
-redisClient.on('error', (err) => {
-  console.error('Erreur de connexion à Redis:', err);
-});
-
-redisClient.connect();
+const redisClient = null;
 
 module.exports = { sequelize, test_connection, redisClient };

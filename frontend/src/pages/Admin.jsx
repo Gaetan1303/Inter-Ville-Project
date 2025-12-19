@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdmin } from '../contexts/AdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useChallenges } from '../contexts/ChallengeContext';
+import { useToastContext } from '../contexts/ToastContext';
 import '../styles/Admin.css';
 
 export default function Admin() {
@@ -17,7 +18,8 @@ export default function Admin() {
   } = useAdmin();
   const { user } = useAuth();
   const { challenges, setChallenges } = useChallenges();
-  console.log(pendingUsers, 'pendingUsers');
+  const { showToast } = useToastContext();
+  // Log supprimé pour la production
 
   // État pour les commentaires
   const [comments] = useState([
@@ -60,9 +62,9 @@ export default function Admin() {
   const handleValidateUser = async (userId) => {
     try {
       await validateUser(userId);
-      alert(`Utilisateur ${userId} validé avec succès !`);
+      showToast(`Utilisateur ${userId} validé avec succès !`, 'success');
     } catch (err) {
-      alert("Erreur lors de la validation de l'utilisateur.");
+      showToast("Erreur lors de la validation de l'utilisateur.", 'error');
     }
   };
 
@@ -75,21 +77,21 @@ export default function Admin() {
 
       // Appel API
       await deleteChallenge(challengeId);
-      alert(`Challenge ${challengeId} supprimé avec succès !`);
+      showToast(`Challenge ${challengeId} supprimé avec succès !`, 'success');
     } catch (error) {
       // En cas d'erreur, restaure la liste et affiche le message
-      alert('Erreur lors de la suppression du challenge.');
+      showToast('Erreur lors de la suppression du challenge.', 'error');
       // Optionnel: rafraîchis la liste depuis l'API
     }
   };
 
   const handleDeleteComment = (commentId) => {
-    alert(`Commentaire ${commentId} supprimé ! (Appel API: DELETE /admin/comments/${commentId})`);
+    showToast(`Commentaire ${commentId} supprimé !`, 'success');
   };
 
   // Charger les utilisateurs en attente quand l'utilisateur connecté existe
   useEffect(() => {
-    console.log('Current user in Admin page:', user);
+    // Log supprimé pour la production
 
     if (user) {
       fetchPendingUsers();

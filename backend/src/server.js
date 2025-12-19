@@ -45,9 +45,9 @@ const start_server = async () => {
     
     // Démarrer le serveur HTTP avec Socket.IO
     server.listen(PORT, '0.0.0.0', () => {
-      // console.log supprimé (bannière serveur)
-      // console.log supprimé (serveur démarré)
-      // console.log supprimé (environnement)
+      console.log(` Serveur démarré sur le port ${PORT}`);
+      console.log(` Environnement: ${process.env.NODE_ENV || 'development'}`);
+      console.log(` CORS autorisé pour: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
       // console.log supprimé (port)
       // console.log supprimé (url)
       // console.log supprimé (api)

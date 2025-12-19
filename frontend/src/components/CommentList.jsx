@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useComments } from "../contexts/CommentContext";
 import { useAuth } from "../contexts/AuthContext";
+import { useToastContext } from "../contexts/ToastContext";
 
 export default function CommentList({ challengeId }) {
   const { fetchComments,postComment } = useComments();
   const { user } = useAuth();
+  const { showToast } = useToastContext();
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [replyingTo, setReplyingTo] = useState(null); // {parentId, parentAuthor}
   const [replyText, setReplyText] = useState("");
-  console.log('vocie les comments',comments); 
+  // Log supprimé pour la production 
 
   useEffect(() => {
     load();
@@ -37,7 +39,10 @@ export default function CommentList({ challengeId }) {
 // appel a la creation de commentaire lors du submit
     const submit = async (e) => {
     e.preventDefault();
-    if (!user) return alert("Connecte-toi pour commenter");
+    if (!user) {
+      showToast("Connecte-toi pour commenter", "warning");
+      return;
+    }
     await postComment({
       challengeId,      
       content: text,

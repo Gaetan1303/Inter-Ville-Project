@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChallenges } from '../contexts/ChallengeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToastContext } from '../contexts/ToastContext';
 
 export default function CreateChallenge() {
   const [title, setTitle] = useState('');
@@ -16,12 +17,16 @@ export default function CreateChallenge() {
 
   const { createChallenge } = useChallenges();
   const { user } = useAuth();
+  const { showToast } = useToastContext();
   const navigate = useNavigate();
 
   // gestion de la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return alert('Connecte-toi pour créer un challenge');
+    if (!user) {
+      showToast('Connecte-toi pour créer un challenge', 'warning');
+      return navigate('/login');
+    }
     setLoading(true);
     setError('');
     setSuccess('');

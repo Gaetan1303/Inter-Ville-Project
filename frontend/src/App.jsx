@@ -5,6 +5,7 @@ import { SocketProvider } from './contexts/SocketContext';
 import { ChallengeProvider } from './contexts/ChallengeContext';
 import { AdminProvider } from './contexts/AdminContext';
 import { CommentProvider } from './contexts/CommentContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -29,38 +30,40 @@ const ProtectedAdminRoute = ({ children }) => {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <SocketProvider>
-        <ChallengeProvider>
-          <AdminProvider>
-            <CommentProvider>
-            <Header />
-            <main className="main">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/Challenges" element={<Challenges />} />
-                <Route path="/Challenge/:id" element={<ChallengeDetail />} />
-                <Route path="/challenges/:id/edit" element={<EditChallenge />} />
-                <Route path="/create" element={<CreateChallenge />} />
-                <Route
-                  path="/admin"
-                  element={
-                    <ProtectedAdminRoute>
-                      <Admin />
-                    </ProtectedAdminRoute>
-                  }
-                />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/profile" element={<Profile />} />
-              </Routes>
-            </main>
-             <ChatWidget />
-            </CommentProvider>              
-          </AdminProvider>
-        </ChallengeProvider>
-        </SocketProvider>
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <SocketProvider>
+          <ChallengeProvider>
+            <AdminProvider>
+              <CommentProvider>
+              <Header />
+              <main className="main">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/Challenges" element={<Challenges />} />
+                  <Route path="/Challenge/:id" element={<ChallengeDetail />} />
+                  <Route path="/challenges/:id/edit" element={<EditChallenge />} />
+                  <Route path="/create" element={<CreateChallenge />} />
+                  <Route
+                    path="/admin"
+                    element={
+                      <ProtectedAdminRoute>
+                        <Admin />
+                      </ProtectedAdminRoute>
+                    }
+                  />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/profile" element={<Profile />} />
+                </Routes>
+              </main>
+               <ChatWidget />
+              </CommentProvider>              
+            </AdminProvider>
+          </ChallengeProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   );
 }
