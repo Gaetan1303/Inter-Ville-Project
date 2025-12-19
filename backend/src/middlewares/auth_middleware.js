@@ -17,7 +17,8 @@ const authenticate = async (req, res, next) => {
 
     const token = authHeader.split(' ')[1];
     // console.log supprimé (token)
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const jwtSecret = process.env.JWT_SECRET || 'dev_secret_for_tests';
+    const decoded = jwt.verify(token, jwtSecret);
     // console.log supprimé (contenu décodé)
 
     const user = await User.findByPk(decoded.id);

@@ -5,29 +5,36 @@ require('dotenv').config();
 /**
  * Configuration de la connexion à la base de données MySQL avec Sequelize
  * Utilise les variables d'environnement pour la configuration
+ * En environnement de test, utilise SQLite en mémoire
  */
-const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
-  {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    dialect: 'mysql',
-    logging: process.env.NODE_ENV === 'development' ? console.log : false,
-    pool: {
-      max: 10,          // Nombre maximum de connexions dans le pool (augmenté)
-      min: 2,           // Nombre minimum de connexions dans le pool (augmenté)
-      acquire: 30000,   // Temps maximum (ms) pour obtenir une connexion
-      idle: 10000       // Temps maximum (ms) qu'une connexion peut rester inactive
-    },
-    define: {
-      timestamps: false,       // Désactivé globalement - chaque modèle gère ses timestamps
-      underscored: false,      // Désactivé - chaque modèle spécifie sa convention
-      freezeTableName: true    // Empêche Sequelize de pluraliser les noms de tables
-    }
-  }
-);
+const sequelize = process.env.NODE_ENV === 'test' 
+  ? new Sequelize({
+      dialect: 'sqlite',
+      storage: ':memory:',
+      logging: false
+    })
+  : new Sequelize(
+      process.env.DB_NAME,
+      process.env.DB_USER,
+      process.env.DB_PASSWORD,
+      {
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        dialect: 'mysql',
+        logging: process.env.NODE_ENV === 'development' ? console.log : false,
+        pool: {
+          max: 10,          // Nombre maximum de connexions dans le pool (augmenté)
+          min: 2,           // Nombre minimum de connexions dans le pool (augmenté)
+          acquire: 30000,   // Temps maximum (ms) pour obtenir une connexion
+          idle: 10000       // Temps maximum (ms) qu'une connexion peut rester inactive
+        },
+        define: {
+          timestamps: false,       // Désactivé globalement - chaque modèle gère ses timestamps
+          underscored: false,      // Désactivé - chaque modèle spécifie sa convention
+          freezeTableName: true    // Empêche Sequelize de pluraliser les noms de tables
+        }
+      }
+    );
 
 /**
  * Teste la connexion à la base de données
