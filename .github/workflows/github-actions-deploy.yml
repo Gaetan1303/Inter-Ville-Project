@@ -44,6 +44,9 @@ jobs:
     name: Build Docker Images
     needs: build-and-test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -58,13 +61,13 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          docker build -t ghcr.io/gaetan1303/inter-ville-backend:latest -f backend/Dockerfile .
-          docker push ghcr.io/gaetan1303/inter-ville-backend:latest
+          docker build -t ghcr.io/${{ github.repository_owner }}/inter-ville-backend:latest -f backend/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/inter-ville-backend:latest
 
       - name: Build and push frontend image
         run: |
-          docker build -t ghcr.io/gaetan1303/inter-ville-frontend:latest -f frontend/Dockerfile .
-          docker push ghcr.io/gaetan1303/inter-ville-frontend:latest
+          docker build -t ghcr.io/${{ github.repository_owner }}/inter-ville-frontend:latest -f frontend/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/inter-ville-frontend:latest
 
   deploy-to-kubernetes:
     name: Deploy to Kubernetes
