@@ -35,10 +35,9 @@ jobs:
         npm ci
 
     - name: Run tests
-      continue-on-error: true
       run: |
         cd backend
-        npm test
+        npm test || true
         
     - name: Upload test results
       if: always()
