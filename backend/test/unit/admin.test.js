@@ -68,7 +68,7 @@ describe('Admin Controller Unit Tests', () => {
 
   describe('validate_user', () => {
     it('should validate a user', async () => {
-      const mockUser = { id: 1, email: 'test@example.com', is_validated: false, save: jest.fn() };
+      const mockUser = { id: 1, email: 'test@example.com', first_name: 'Test', is_validated: false, save: jest.fn() };
       User.findByPk = jest.fn(() => Promise.resolve(mockUser));
 
       const req = { params: { id: 1 } };

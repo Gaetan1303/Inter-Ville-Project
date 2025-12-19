@@ -3,9 +3,10 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 
-// Route pour uploader une image de challenge (JSON: { filename, data })
-router.post('/challenges/upload-image', require('../controllers/challenge_controller').uploadChallengeImage);
 const challengeController = require('../controllers/challenge_controller');
+
+// Route pour uploader une image de challenge (JSON: { filename, data })
+router.post('/upload-image', challengeController.uploadChallengeImage);
 
 // Route pour lister les challenges avec filtres
 router.get('/challenges', challengeController.getChallenges);
