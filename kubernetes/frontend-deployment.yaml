@@ -15,10 +15,10 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: frontend:latest
-        imagePullPolicy: IfNotPresent
+        image: ghcr.io/gaetan1303/inter-ville-frontend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         env:
-        - name: VITE_BACKEND_URL
-          value: http://10.99.115.113:5000
+        - name: VITE_API_URL
+          value: http://inter-ville.local/api

@@ -44,9 +44,52 @@ const test_connection = async () => {
   }
 };
 
-// Configuration de la connexion Redis - DÉSACTIVÉ TEMPORAIREMENT
-console.log('Redis désactivé temporairement pour diagnostic');
+// Configuration de la connexion Redis
+let redisClient = null;
 
-const redisClient = null;
+try {
+  const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+  redisClient = redis.createClient({
+    url: redisUrl,
+    retry_strategy: (options) => {
+      if (options.error && options.error.code === 'ECONNREFUSED') {
+        console.log('⚠️  Redis server refused connection');
+      }
+      if (options.total_retry_time > 1000 * 60 * 60) {
+        console.log('⚠️  Redis retry time exhausted');
+        return new Error('Retry time exhausted');
+      }
+      if (options.attempt > 10) {
+        console.log('⚠️  Redis retry attempts exhausted');
+        return undefined;
+      }
+      // Reconnect after
+      return Math.min(options.attempt * 100, 3000);
+    }
+  });
+
+  redisClient.on('connect', () => {
+    console.log('✅ Redis connected successfully');
+  });
+
+  redisClient.on('error', (err) => {
+    console.error('❌ Redis connection error:', err.message);
+  });
+
+  redisClient.on('ready', () => {
+    console.log('🚀 Redis is ready to use');
+  });
+
+  // Connect to Redis
+  redisClient.connect().catch((err) => {
+    console.error('⚠️  Redis initial connection failed:', err.message);
+    console.log('🔄 Application will continue without Redis cache');
+  });
+
+} catch (error) {
+  console.error('⚠️  Redis setup failed:', error.message);
+  console.log('🔄 Application will continue without Redis cache');
+  redisClient = null;
+}
 
 module.exports = { sequelize, test_connection, redisClient };

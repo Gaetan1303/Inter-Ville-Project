@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: backend
-        image: inter-ville-backend:latest
-        imagePullPolicy: Never
+        image: ghcr.io/gaetan1303/inter-ville-backend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         env:
@@ -27,12 +27,33 @@ spec:
         - name: DB_NAME
           value: cdpi_network
         - name: DB_USER
-          value: cdpi_network_user
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: username
         - name: DB_PASSWORD
-          value: cdpi_network_password
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: password
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: jwt-secret
+        - name: SMTP_USER
+          valueFrom:
+            secretKeyRef:
+              name: email-credentials
+              key: smtp-user
+        - name: SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: email-credentials
+              key: smtp-password
         - name: REDIS_URL
           value: redis://redis-service:6379
         - name: NODE_ENV
-          value: development
+          value: production
         - name: FRONTEND_URL
-          value: http://localhost:5173
+          value: http://inter-ville.local

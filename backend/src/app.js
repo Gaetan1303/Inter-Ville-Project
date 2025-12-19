@@ -7,6 +7,7 @@ const morgan = require("morgan");
 const compression = require("compression");
 require("dotenv").config();
 const routes = require("./routes");
+const { logger, requestLogger, logInfo } = require("./utils/logger");
 
 /**
  * Configuration de l'application Express
@@ -60,7 +61,9 @@ if (process.env.NODE_ENV === "production") {
         process.env.FRONTEND_URL || "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000" // Ajout pour Minikube
+        "http://127.0.0.1:3000",
+        "http://inter-ville.local",
+        "https://inter-ville.local"
       ],
       credentials: true,
     })
@@ -88,7 +91,10 @@ if (process.env.NODE_ENV === "production") {
 // Compression - Compresse les réponses HTTP
 app.use(compression());
 
-// Morgan - Logger les requêtes HTTP en développement
+// Logs HTTP structurés pour le monitoring
+app.use(requestLogger);
+
+// Morgan - Logger les requêtes HTTP en développement  
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
@@ -108,7 +114,7 @@ app.use(express.urlencoded({ extended: true }));
  */
 
 // Point d'entrée principal de l'API
-app.use("/", routes);
+app.use("/api", routes);
 
 // Route de santé - Vérifie que l'API fonctionne
 app.get("/heal", (req, res) => {

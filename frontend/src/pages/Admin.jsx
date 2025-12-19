@@ -19,6 +19,10 @@ export default function Admin() {
   const { user } = useAuth();
   const { challenges, setChallenges } = useChallenges();
   const { showToast } = useToastContext();
+  
+  // État pour les onglets
+  const [activeTab, setActiveTab] = useState('dashboard');
+  
   // Log supprimé pour la production
 
   // État pour les commentaires
@@ -102,7 +106,44 @@ export default function Admin() {
     <div className="admin-container">
       <h1>Dashboard Admin</h1>
 
-      {/* Statistiques globales */}
+      {/* Navigation par onglets */}
+      <nav className="admin-tabs">
+        <button 
+          className={`tab-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dashboard')}
+        >
+           Dashboard
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}
+        >
+           Utilisateurs
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'challenges' ? 'active' : ''}`}
+          onClick={() => setActiveTab('challenges')}
+        >
+           Challenges
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'comments' ? 'active' : ''}`}
+          onClick={() => setActiveTab('comments')}
+        >
+           Commentaires
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
+          onClick={() => setActiveTab('logs')}
+        >
+           Logs Kibana
+        </button>
+      </nav>
+
+      {/* Contenu des onglets */}
+      {activeTab === 'dashboard' && (
+        <>
+          {/* Statistiques globales */}
       <section className="stats-section">
         <h2>Statistiques Globales</h2>
         <div className="stats-grid">
@@ -124,8 +165,13 @@ export default function Admin() {
           </div>
         </div>
       </section>
+        </>
+      )}
 
-      {/* Gestion des utilisateurs en attente */}
+      {/* Onglet Utilisateurs */}
+      {activeTab === 'users' && (
+        <>
+          {/* Gestion des utilisateurs en attente */}
       <section className="users-section">
         <h2>Comptes en Attente de Validation</h2>
         {error && <p className="empty-message">Erreur: {error}</p>}
@@ -180,8 +226,13 @@ export default function Admin() {
           )
         )}
       </section>
+        </>
+      )}
 
-      {/* Gestion des challenges */}
+      {/* Onglet Challenges */}
+      {activeTab === 'challenges' && (
+        <>
+          {/* Gestion des challenges */}
       <section className="challenges-section">
         <h2>Gestion des Challenges</h2>
         {challenges.length > 0 ? (
@@ -224,8 +275,13 @@ export default function Admin() {
           <p className="empty-message">Aucun challenge trouvé.</p>
         )}
       </section>
+        </>
+      )}
 
-      {/* Gestion des commentaires */}
+      {/* Onglet Commentaires */}
+      {activeTab === 'comments' && (
+        <>
+          {/* Gestion des commentaires */}
       <section className="comments-section">
         <h2>Gestion des Commentaires</h2>
         {comments.length > 0 ? (
@@ -264,6 +320,88 @@ export default function Admin() {
           <p className="empty-message">Aucun commentaire trouvé.</p>
         )}
       </section>
+        </>
+      )}
+
+      {/* Onglet Logs Kibana */}
+      {activeTab === 'logs' && (
+        <section className="kibana-section">
+          <div className="kibana-header">
+            <h2>📈 Monitoring des Logs - Kibana</h2>
+            <div className="kibana-actions">
+              <a 
+                href="/kibana" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+              >
+                 Ouvrir Kibana en plein écran
+              </a>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => document.getElementById('kibana-iframe')?.contentWindow?.location.reload()}
+              >
+                 Actualiser
+              </button>
+            </div>
+          </div>
+          
+          <div className="kibana-info">
+            <div className="info-cards">
+              <div className="info-card">
+                <div className="info-label"> Dashboards disponibles</div>
+                <div className="info-content">
+                  <ul>
+                    <li>Vue d'ensemble de l'application</li>
+                    <li>Monitoring des erreurs</li>
+                    <li>Performance des API</li>
+                    <li>Activité des utilisateurs</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="info-card">
+                <div className="info-label">🔍 Index disponibles</div>
+                <div className="info-content">
+                  <p><strong>Pattern :</strong> inter-ville-*</p>
+                  <p><strong>Services :</strong> Backend, Frontend</p>
+                  <p><strong>Retention :</strong> 7 jours</p>
+                </div>
+              </div>
+              
+              <div className="info-card">
+                <div className="info-label">⚡ Métriques temps réel</div>
+                <div className="info-content">
+                  <ul>
+                    <li>Requêtes HTTP/min</li>
+                    <li>Temps de réponse P95</li>
+                    <li>Taux d'erreur</li>
+                    <li>Logs par niveau</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="kibana-embed">
+            <iframe
+              id="kibana-iframe"
+              src="/kibana/app/dashboards"
+              title="Kibana Dashboard"
+              className="kibana-iframe"
+              frameBorder="0"
+              allowFullScreen
+            />
+          </div>
+          
+          <div className="kibana-footer">
+            <p className="help-text">
+               <strong>Astuce :</strong> Utilisez les filtres temporels pour analyser différentes périodes. 
+              Les logs sont automatiquement collectés depuis tous les services de l'application.
+            </p>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

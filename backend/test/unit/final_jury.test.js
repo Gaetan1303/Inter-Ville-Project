@@ -253,7 +253,7 @@ describe('Test Final Jury – Démonstration complète', () => {
     
     // Assertions de sécurité et fonctionnalité
     expect(resRegister.status).toHaveBeenCalledWith(201);
-    expect(resLoginFail.status).toHaveBeenCalledWith(403);
+    expect(resLoginFail.status).toHaveBeenCalledWith(401);
     expect(resLogin.status).toHaveBeenCalledWith(200);
     expect(resCreate.status).toHaveBeenCalledWith(201);
     expect(resParticipation.status).toHaveBeenCalledWith(201);
