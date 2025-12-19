@@ -158,16 +158,6 @@ const login = async (req, res) => {
     }
 
     // Vérifier le mot de passe
-    const fs = require('fs');
-    if (user) {
-      return res.status(200).json({
-        success: false,
-        debug: true,
-        hash: user.password,
-        message: 'Hash récupéré pour debug',
-      });
-    }
-
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     console.log('Résultat bcrypt:', isPasswordValid);
     if (!isPasswordValid) {

@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: backend
-        image: backend:final-fix
-        imagePullPolicy: Never
+        image: cdpi-backend:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
         env:

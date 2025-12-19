@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: inter-ville-frontend:v2
-        imagePullPolicy: Never
+        image: frontend:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3000
         env:
