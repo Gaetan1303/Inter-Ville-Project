@@ -21,12 +21,6 @@ const Toast = ({ message, type = 'error', duration = 5000, onClose }) => {
   return (
     <div className={`toast toast-${type} ${isVisible ? 'toast-show' : 'toast-hide'}`}>
       <div className="toast-content">
-        <span className="toast-icon">
-          {type === 'error' && '❌'}
-          {type === 'success' && '✅'}
-          {type === 'warning' && '⚠️'}
-          {type === 'info' && 'ℹ️'}
-        </span>
         <span className="toast-message">{message}</span>
         <button className="toast-close" onClick={handleClose}>
           ✕

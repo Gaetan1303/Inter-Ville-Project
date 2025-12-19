@@ -88,7 +88,12 @@ export default function ChallengePage() {
       setIsParticipating(true);
       showToast('Participation enregistrée avec succès !', 'success', { duration: 5000 });
     } catch (error) {
-      showToast('Une erreur est survenue lors de l\'enregistrement de votre participation', 'error', { duration: 5000 });
+      if (error.response?.status === 409) {
+        setIsParticipating(true);
+        showToast('Vous participez déjà à ce défi', 'info', { duration: 5000 });
+      } else {
+        showToast('Une erreur est survenue lors de l\'enregistrement de votre participation', 'error', { duration: 5000 });
+      }
     } finally {
       setParticipationLoading(false);
     }

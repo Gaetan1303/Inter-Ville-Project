@@ -57,6 +57,12 @@ exports.updateChallenge = async (req, res) => {
     if (!challenge) {
       return res.status(404).json({ success: false, message: 'Challenge introuvable' });
     }
+    
+    // Vérifier que l'utilisateur est autorisé (créateur ou admin)
+    if (req.user && challenge.created_by !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Accès refusé' });
+    }
+    
     await challenge.update(req.body);
     res.status(200).json({ success: true, data: challenge });
   } catch (error) {

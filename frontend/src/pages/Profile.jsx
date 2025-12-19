@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useChallenges } from '../contexts/ChallengeContext';
 import { useToastContext } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 import '../styles/Admin.css';
 
 export default function Profile() {
@@ -10,6 +11,7 @@ export default function Profile() {
   const { user, logout } = useAuth();
   const { challenges, deleteChallenge } = useChallenges();
   const { showToast } = useToastContext();
+  const [badges, setBadges] = useState([]);
   const userChallenges = challenges.filter((c) => c.created_by === user?.id);
   // Log supprimé pour la production
 
@@ -36,9 +38,28 @@ export default function Profile() {
     }
   }, [user, navigate]);
 
-  if (!user) {
-    return null;
-  }
+  useEffect(() => {
+    // Suppression de la récupération des badges pour les utilisateurs
+    setBadges([]);
+  }, [user]);
+
+  useEffect(() => {
+    const interceptor = axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          logout();
+          navigate('/login');
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axiosInstance.interceptors.response.eject(interceptor);
+    };
+  }, [logout, navigate]);
+
 
   return (
     <div className="admin-container">
@@ -114,7 +135,6 @@ export default function Profile() {
                         Edit
                       </button>
                       <button
-                        
                         className="action-btn delete-btn"
                         onClick={() => handleDelete(challenge.id, challenge.title)}
                         title="Supprimer"
@@ -130,6 +150,63 @@ export default function Profile() {
         ) : (
           <p className="empty-message">Vous n'avez cree aucun challenge pour le moment.</p>
         )}
+      </section>
+
+      {/* Section Mes Badges */}
+      <section className="badges-section">
+        <h2>Mes Badges</h2>
+        {badges.length > 0 ? (
+          <ul>
+            {badges.map((badge, idx) => (
+              <li key={idx} className="badge-pill">{badge}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="muted">Aucun badge pour le moment.</p>
+        )}
+      </section>
+
+      {/* Section Avatar */}
+      <section className="avatar-section">
+        <h2>Mon Avatar</h2>
+        <div className="avatar-container">
+          <img
+            src={user.avatar || '/default-avatar.png'}
+            alt="Avatar utilisateur"
+            className="avatar-image"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            id="avatar-upload"
+            style={{ display: 'none' }}
+            onChange={async (e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const formData = new FormData();
+                formData.append('avatar', file);
+                try {
+                  const res = await axiosInstance.post('/users/avatar', formData, {
+                    headers: {
+                      'Content-Type': 'multipart/form-data',
+                    },
+                  });
+                  showToast('Avatar mis à jour avec succès !', 'success');
+                  // Mettre à jour l'avatar de l'utilisateur
+                  user.avatar = res.data.avatar;
+                } catch (err) {
+                  showToast('Erreur lors de la mise à jour de l\'avatar.', 'error');
+                }
+              }
+            }}
+          />
+          <button
+            className="action-btn upload-btn"
+            onClick={() => document.getElementById('avatar-upload').click()}
+          >
+            Upload Avatar
+          </button>
+        </div>
       </section>
     </div>
   );

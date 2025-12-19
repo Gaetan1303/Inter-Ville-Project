@@ -5,6 +5,7 @@ const challengeRoutes = require('./challenge_routes');
 const adminRoutes = require('./admin_routes');
 const commentRoutes = require('./comment_routes');
 const participationRoutes = require('./participation_routes');
+const userRoutes = require('./user_routes');
 
 /**
  * Point d'entrée principal de toutes les routes de l'API
@@ -16,6 +17,7 @@ router.use('/', challengeRoutes);
 router.use('/admin', adminRoutes);
 router.use('/comments', commentRoutes);
 router.use('/participations', participationRoutes);
+router.use('/users', userRoutes);
 
 /**
  * Route racine de l'API - Message de bienvenue et documentation

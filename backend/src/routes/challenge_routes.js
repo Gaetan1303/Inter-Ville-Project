@@ -15,14 +15,15 @@ router.get('/challenges/:id', challengeController.getChallengeById);
 
 
 const { validateChallenge } = require('../validators/challenge_validator');
+const authenticate = require('../middlewares/auth_middleware');
 
 // Route pour créer un challenge (avec validation)
-router.post('/challenges', validateChallenge, challengeController.createChallenge);
+router.post('/challenges', authenticate, validateChallenge, challengeController.createChallenge);
 
 // Route pour modifier un challenge (avec validation)
-router.put('/challenges/:id', validateChallenge, challengeController.updateChallenge);
+router.put('/challenges/:id', authenticate, validateChallenge, challengeController.updateChallenge);
 
 // Route pour supprimer un challenge
-router.delete('/challenges/:id', challengeController.deleteChallenge);
+router.delete('/challenges/:id', authenticate, challengeController.deleteChallenge);
 
 module.exports = router;
