@@ -1,0 +1,126 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+      - production
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run backend tests
+        run: |
+          cd backend
+          npm test
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+  build-docker-images:
+    name: Build Docker Images
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        run: |
+          docker build -t ghcr.io/gaetan1303/inter-ville-backend:latest -f backend/Dockerfile .
+          docker push ghcr.io/gaetan1303/inter-ville-backend:latest
+
+      - name: Build and push frontend image
+        run: |
+          docker build -t ghcr.io/gaetan1303/inter-ville-frontend:latest -f frontend/Dockerfile .
+          docker push ghcr.io/gaetan1303/inter-ville-frontend:latest
+
+  deploy-to-kubernetes:
+    name: Deploy to Kubernetes
+    needs: build-docker-images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Apply secrets
+        run: |
+          kubectl apply -f kubernetes/secrets.yaml
+
+      - name: Deploy MySQL
+        run: |
+          kubectl apply -f kubernetes/mysql-init-configmap.yaml
+          kubectl apply -f kubernetes/mysql-deployment.yaml
+          kubectl apply -f kubernetes/mysql-service.yaml
+
+      - name: Deploy Redis
+        run: |
+          kubectl apply -f kubernetes/redis-deployment.yaml
+          kubectl apply -f kubernetes/redis-service.yaml
+
+      - name: Deploy Backend
+        run: |
+          kubectl apply -f kubernetes/backend-deployment.yaml
+          kubectl apply -f kubernetes/backend-service.yaml
+
+      - name: Deploy Frontend
+        run: |
+          kubectl apply -f kubernetes/frontend-deployment.yaml
+          kubectl apply -f kubernetes/frontend-service.yaml
+
+      - name: Deploy Logging Stack
+        run: |
+          kubectl apply -f kubernetes/elk-stack.yaml
+          kubectl apply -f kubernetes/logging-pipeline.yaml
+
+      - name: Deploy Ingress
+        run: |
+          kubectl apply -f kubernetes/ingress.yaml
+
+      - name: Wait for deployment
+        run: |
+          kubectl rollout status deployment/backend
+          kubectl rollout status deployment/frontend

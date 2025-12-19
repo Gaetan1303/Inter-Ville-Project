@@ -11,10 +11,41 @@
 
 .admin-container h1 {
   color: #333;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   font-size: 2.5em;
   border-bottom: 3px solid #007bff;
   padding-bottom: 10px;
+}
+
+/* Navigation par onglets */
+.admin-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.tab-btn {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  background-color: #f8f9fa;
+  color: #007bff;
+}
+
+.tab-btn.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+  background-color: #f8f9fa;
 }
 
 .admin-container h2 {
@@ -233,6 +264,134 @@
   .comment-text {
     max-width: 150px;
   }
+
+  .admin-tabs {
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .kibana-iframe {
+    height: 500px;
+  }
+}
+
+/* Styles pour l'onglet Kibana */
+.kibana-section {
+  margin-bottom: 40px;
+}
+
+.kibana-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.kibana-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.kibana-info {
+  margin-bottom: 25px;
+}
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.info-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.info-label {
+  font-weight: bold;
+  color: #495057;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.info-content {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.info-content ul {
+  margin: 5px 0;
+  padding-left: 20px;
+}
+
+.info-content li {
+  margin-bottom: 4px;
+}
+
+.info-content p {
+  margin: 3px 0;
+}
+
+.kibana-embed {
+  background: #fff;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.kibana-iframe {
+  width: 100%;
+  height: 700px;
+  border: none;
+  display: block;
+}
+
+.kibana-footer {
+  text-align: center;
+  padding: 15px;
+  background: #e9ecef;
+  border-radius: 6px;
+}
+
+.help-text {
+  margin: 0;
+  color: #495057;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+  border-color: #4e555b;
 }
 
 @media (max-width: 480px) {
