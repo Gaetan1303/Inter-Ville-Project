@@ -14,6 +14,11 @@ const { send_validation_email } = require('../services/email_service');
  */
 const get_pending_users = async (req, res) => {
   try {
+    // Vérifier que la connexion DB est active
+    if (!User) {
+      throw new Error('Modèle User non disponible');
+    }
+    
     const pendingUsers = await User.findAll({ where: { is_validated: false } });
 
     res.status(200).json({

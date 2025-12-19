@@ -23,7 +23,7 @@ describe('Upload image challenge', () => {
   it('doit uploader une image en base64', async () => {
     const data = fs.readFileSync(testFile).toString('base64');
     const res = await request(app)
-      .post('/challenges/upload-image')
+      .post('/api/upload-image')
       .send({ filename, data })
       .set('Content-Type', 'application/json');
     expect(res.status).toBe(201);

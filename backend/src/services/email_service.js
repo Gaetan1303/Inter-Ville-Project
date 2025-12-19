@@ -22,6 +22,9 @@ const transporter = nodemailer.createTransport({
  */
 const send_welcome_email = async (email, first_name) => {
   try {
+    if (!email) {
+      throw new Error('Email address is required');
+    }
     const mail_options = {
       from: process.env.EMAIL_FROM || 'noreply@laplateforme.io',
       to: email,
@@ -44,6 +47,9 @@ const send_welcome_email = async (email, first_name) => {
  */
 const send_validation_email = async (email, first_name) => {
   try {
+    if (!email) {
+      throw new Error('Email address is required');
+    }
     const mail_options = {
       from: process.env.EMAIL_FROM || 'noreply@laplateforme.io',
       to: email,

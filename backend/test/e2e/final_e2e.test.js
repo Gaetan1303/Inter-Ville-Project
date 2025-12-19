@@ -70,10 +70,22 @@ describe('E2E - Flux utilisateur complet', () => {
 
   afterAll(async () => {
     // Nettoyer les données de test
-    await Comment.destroy({ where: { user_id: userId } });
-    await Challenge.destroy({ where: { created_by: userId } });
-    await User.destroy({ where: { id: [userId, adminId] } });
-    await sequelize.close();
+    try {
+      if (userId) {
+        await Comment.destroy({ where: { user_id: userId } });
+        await Challenge.destroy({ where: { created_by: userId } });
+      }
+      if (userId || adminId) {
+        const idsToDelete = [userId, adminId].filter(id => id !== undefined);
+        if (idsToDelete.length > 0) {
+          await User.destroy({ where: { id: idsToDelete } });
+        }
+      }
+    } catch (error) {
+      console.error('Erreur lors du nettoyage des tests:', error);
+    } finally {
+      await sequelize.close();
+    }
   });
 
   // ==================== TESTS ====================
