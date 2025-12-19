@@ -34,18 +34,8 @@ jobs:
         cd backend
         npm ci
 
-    - name: Skip tests (temporarily disabled)
+    - name: Build completed
       run: |
         cd backend
-        echo "Tests are temporarily skipped for CI/CD workflow"
-        echo "Unit tests: 22 passing "
-        echo "Integration tests: 12 skipped " 
-        echo "E2E tests: 22 skipped "
-        echo "Workflow completed successfully"
-        
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: backend/coverage/
+        echo "Backend dependencies installed successfully"
+        echo "Workflow completed without tests"
