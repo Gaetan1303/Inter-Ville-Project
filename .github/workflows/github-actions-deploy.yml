@@ -68,7 +68,7 @@ jobs:
       - name: Build and push frontend image
         run: |
           REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          docker build -t ghcr.io/$REPO_OWNER/inter-ville-frontend:latest -f frontend/Dockerfile .
+          docker build -t ghcr.io/$REPO_OWNER/inter-ville-frontend:latest -f frontend/Dockerfile ./frontend
           docker push ghcr.io/$REPO_OWNER/inter-ville-frontend:latest
 
   deploy-to-kubernetes:
