@@ -9,7 +9,7 @@ module.exports = {
   // Force exit to prevent hanging tests
   forceExit: true,
   // Detect open handles that might prevent Jest from exiting
-  detectOpenHandles: false,
+  detectOpenHandles: true,
   // Clear mocks between tests
   clearMocks: true,
   // Timeout for tests

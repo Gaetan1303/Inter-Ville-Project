@@ -1,6 +1,13 @@
 // Fichier de setup global pour Jest
 // Centralise les mocks, le nettoyage de la base, etc.
 
+// Charger les variables d'environnement pour les tests
+require('dotenv').config({ path: '.env.test' });
+
+// S'assurer que JWT_SECRET est défini pour les tests
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test_secret_key_for_ci_cd';
+process.env.NODE_ENV = 'test';
+
 // Exemple : mock global de nodemailer (évite les vrais envois d'emails)
 jest.mock('nodemailer', () => ({
   createTransport: jest.fn(() => ({ sendMail: jest.fn().mockResolvedValue(true) }))
