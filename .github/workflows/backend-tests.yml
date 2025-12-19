@@ -38,4 +38,4 @@ jobs:
       run: |
         cd backend
         echo "Backend dependencies installed successfully"
-        echo "Workflow completed without tests"
+        echo "Tests are disabled - workflow completed"
