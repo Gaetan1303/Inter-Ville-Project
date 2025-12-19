@@ -27,6 +27,18 @@ export default function Profile() {
     }
   };
 
+  // Fonction pour se desister d'une participation
+  const handleDeleteParticipation = async (participationId, challengeTitle) => {
+    if (window.confirm(`Voulez-vous vraiment vous desister du challenge "${challengeTitle}" ?`)) {
+      try {
+        await deleteParticipation(participationId);
+        alert('Participation supprimee avec succes !');
+      } catch (err) {
+        alert('Erreur lors de la suppression de la participation.');
+      }
+    }
+  };
+
   // Fonction pour rediriger vers la page de modification
   const handleEdit = (id) => {
     navigate(`/challenges/${id}/edit`);

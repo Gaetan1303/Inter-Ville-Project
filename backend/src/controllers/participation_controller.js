@@ -86,8 +86,8 @@ exports.getParticipationsByChallenge = async (req, res) => {
     const { id } = req.params;
     // Log supprimé pour la production
     const participations = await Participation.findAll({
-      where: { challenge_id: id },
-      include: [{ model: User, attributes: { exclude: ['password'] } }]
+      where: { challenge_id: challengeId },
+      include: [{ model: User, as: 'user', attributes: { exclude: ['password'] } }]
     });
     res.status(200).json({ success: true, data: participations });
   } catch (err) {

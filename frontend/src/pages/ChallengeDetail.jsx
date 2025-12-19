@@ -47,7 +47,7 @@ export default function ChallengePage() {
   
   const load = async () => {
     try {
-      // appel de la fonction fetchChallengeById du contexte
+      // Charger le challenge
       const data = await fetchChallengeById(id);
       setChallenge(data);
       
@@ -96,6 +96,27 @@ export default function ChallengePage() {
       }
     } finally {
       setParticipationLoading(false);
+    }
+  };
+
+  // Handler pour participer au challenge
+  const handleParticipate = async () => {
+    if (!user) {
+      alert('Connecte-toi pour participer a ce challenge');
+      return;
+    }
+    if (isParticipating) {
+      alert('Tu participes deja a ce challenge !');
+      return;
+    }
+    try {
+      await createParticipation(id, user.id);
+      setIsParticipating(true);
+      setParticipantCount((prev) => prev + 1);
+      alert('Participation enregistree avec succes !');
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Erreur lors de la participation';
+      alert(msg);
     }
   };
 
