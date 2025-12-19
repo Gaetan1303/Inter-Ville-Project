@@ -2,17 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useChallenges } from '../contexts/ChallengeContext';
 import { useAuth } from '../contexts/AuthContext';
-import { useParticipation } from '../contexts/ParticipationContext';
+import { useToastContext } from '../contexts/ToastContext';
 import CommentList from '../components/CommentList';
+import axiosInstance from '../api/axiosInstance';
 
 export default function ChallengePage() {
   const { id } = useParams();
   const { fetchChallengeById } = useChallenges();
   const { user } = useAuth();
-  const { createParticipation, getChallengeParticipations, loading } = useParticipation();
+  const { showToast } = useToastContext();
   const [challenge, setChallenge] = useState(null);
   const [isParticipating, setIsParticipating] = useState(false);
-  const [participantCount, setParticipantCount] = useState(0);
+  const [participationLoading, setParticipationLoading] = useState(false);
 
   // Utilitaires pour afficher la progression entre start/end
   const computeProgress = (startDate, endDate) => {
@@ -50,17 +51,51 @@ export default function ChallengePage() {
       const data = await fetchChallengeById(id);
       setChallenge(data);
       
-      // Charger les participations
-      const participants = await getChallengeParticipations(id);
-      setParticipantCount(participants.length);
-      
-      // Verifier si l'utilisateur participe deja
+      // Vérifier si l'utilisateur participe déjà
       if (user) {
-        const userParticipates = participants.some((p) => p.user_id === user.id);
-        setIsParticipating(userParticipates);
+        await checkParticipation();
       }
     } catch {
-      console.error('Erreur lors du chargement du défi.');
+      // Erreur silencieuse pour la production
+    }
+  };
+
+  const checkParticipation = async () => {
+    try {
+      const response = await axiosInstance.get(`/participations/user/${user.id}`);
+      const userParticipations = response.data.data || [];
+      const isAlreadyParticipating = userParticipations.some(p => p.challenge_id === parseInt(id));
+      setIsParticipating(isAlreadyParticipating);
+    } catch (error) {
+      // Erreur silencieuse
+    }
+  };
+
+  const handleParticipation = async () => {
+    if (!user) {
+      showToast('Vous devez être connecté pour participer', 'warning', { duration: 5000 });
+      return;
+    }
+
+    if (isParticipating) {
+      showToast('Vous participez déjà à ce défi', 'info', { duration: 5000 });
+      return;
+    }
+
+    setParticipationLoading(true);
+    try {
+      await axiosInstance.post(`/participations/${id}`, { challenge_id: id });
+      setIsParticipating(true);
+      showToast('Participation enregistrée avec succès !', 'success', { duration: 5000 });
+    } catch (error) {
+      if (error.response?.status === 409) {
+        setIsParticipating(true);
+        showToast('Vous participez déjà à ce défi', 'info', { duration: 5000 });
+      } else {
+        showToast('Une erreur est survenue lors de l\'enregistrement de votre participation', 'error', { duration: 5000 });
+      }
+    } finally {
+      setParticipationLoading(false);
     }
   };
 
@@ -126,15 +161,23 @@ export default function ChallengePage() {
 
     
 
-        <div style={{ marginTop: '12px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={{ marginTop: '12px' }}>
           <button 
-            onClick={handleParticipate} 
-            disabled={loading || isParticipating}
-            style={{ opacity: isParticipating ? 0.6 : 1 }}
+            onClick={handleParticipation}
+            disabled={participationLoading || isParticipating}
+            style={{
+              backgroundColor: isParticipating ? '#28a745' : '#007bff',
+              color: 'white',
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              cursor: participationLoading ? 'wait' : (isParticipating ? 'not-allowed' : 'pointer'),
+              opacity: participationLoading ? 0.7 : 1
+            }}
           >
-            {isParticipating ? 'Deja inscrit' : 'Participer'}
+            {participationLoading ? 'Chargement...' : 
+             isParticipating ? 'Déjà inscrit' : 'Participer'}
           </button>
-          <span className="muted">{participantCount} participant{participantCount > 1 ? 's' : ''}</span>
         </div>
       </article>
 

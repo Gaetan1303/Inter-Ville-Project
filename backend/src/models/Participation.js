@@ -45,6 +45,16 @@ const Participation = sequelize.define('Participation', {
       min: 0,
       max: 100
     }
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW
   }
 }, {
   tableName: 'participations',
@@ -66,5 +76,12 @@ const Participation = sequelize.define('Participation', {
     }
   ]
 });
+
+Participation.associate = (models) => {
+  Participation.belongsTo(models.Challenge, {
+    foreignKey: 'challenge_id',
+    as: 'challenge',
+  });
+};
 
 module.exports = Participation;

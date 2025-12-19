@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const Challenge = require('../models/Challenge');
 const Comment = require('../models/Comment');
+const Participation = require('../models/Participation');
+const { sequelize } = require('../config/database');
 const { send_validation_email } = require('../services/email_service');
 
 /**
@@ -155,9 +157,14 @@ const delete_comment = async (req, res) => {
  */
 const get_stats = async (req, res) => {
   try {
-    const userCount = await User.count();
-    const challengeCount = await Challenge.count();
-    const commentCount = await Comment.count();
+    const [userCount, challengeCount, commentCount, participationCount, validatedUsers, activeUsers] = await Promise.all([
+      User.count(),
+      Challenge.count(),
+      Comment.count(),
+      Participation.count(),
+      User.count({ where: { is_validated: true } }),
+      User.count({ where: { is_validated: true, role: 'user' } })
+    ]);
 
     res.status(200).json({
       success: true,
@@ -165,14 +172,82 @@ const get_stats = async (req, res) => {
         users: userCount,
         challenges: challengeCount,
         comments: commentCount,
+        participations: participationCount,
+        validatedUsers: validatedUsers,
+        activeUsers: activeUsers
       },
     });
   } catch (error) {
-    console.error("Erreur lors de la récupération des statistiques:", error);
+    // Log supprimé pour la production
     res.status(500).json({
       success: false,
       message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message
     });
+  }
+};
+
+/**
+ * Récupérer le classement global
+ * @route GET /admin/leaderboard
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} res - Objet de réponse Express
+ * @returns {Object} Réponse JSON avec le classement
+ */
+const get_leaderboard = async (req, res) => {
+  try {
+    const type = req.query.type || 'global';
+    let leaderboard;
+    if (type === 'city') {
+      leaderboard = await User.findAll({
+        attributes: ['city', [sequelize.fn('SUM', sequelize.col('score')), 'totalScore']],
+        include: [{ model: Participation, attributes: [] }],
+        group: ['city'],
+        order: [[sequelize.fn('SUM', sequelize.col('score')), 'DESC']],
+      });
+    } else if (type === 'promo') {
+      leaderboard = await User.findAll({
+        attributes: ['promo', [sequelize.fn('SUM', sequelize.col('score')), 'totalScore']],
+        include: [{ model: Participation, attributes: [] }],
+        group: ['promo'],
+        order: [[sequelize.fn('SUM', sequelize.col('score')), 'DESC']],
+      });
+    } else {
+      leaderboard = await User.findAll({
+        attributes: ['id', 'first_name', 'last_name', 'score'],
+        order: [['score', 'DESC']],
+        limit: 10,
+      });
+    }
+    res.status(200).json({ success: true, data: leaderboard });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur serveur leaderboard' });
+  }
+};
+
+/**
+ * Récupérer les badges d'un utilisateur
+ * @route GET /admin/users/:userId/badges
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} res - Objet de réponse Express
+ * @returns {Object} Réponse JSON avec les badges de l'utilisateur
+ */
+const get_badges = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+    
+    const participations = await Participation.findAll({ where: { user_id: userId } });
+    const badges = [];
+    
+    if (participations.length >= 5) badges.push('Participant régulier');
+    if (participations.some(p => p.score >= 100)) badges.push('Score 100+');
+    if (participations.length > 0) badges.push('Premier défi');
+    
+    res.status(200).json({ success: true, badges });
+  } catch (error) {
+    console.error('Erreur badges:', error);
+    res.status(500).json({ success: false, message: 'Erreur serveur badges' });
   }
 };
 
@@ -182,4 +257,6 @@ module.exports = {
   delete_challenge,
   delete_comment,
   get_stats,
+  get_leaderboard,
+  get_badges,
 };

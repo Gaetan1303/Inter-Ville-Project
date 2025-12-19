@@ -74,7 +74,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const res = await API.post('/auth/login', { email, password });
-      console.log('Login response:', res.data);
+      // Log supprimé pour la production
 
       // Vérifier que la connexion a réussi
       if (!res.data.success) {

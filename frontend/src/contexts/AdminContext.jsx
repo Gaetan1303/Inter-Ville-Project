@@ -15,7 +15,7 @@ export const AdminProvider = ({ children }) => {
     setError(null);
     try {
       const res = await API.get('/admin/users/pending');
-      console.log('GET /admin/users/pending ->', res.status, res.data);
+      // Log supprimé pour la production
       if (res.data.success) {
         setPendingUsers(res.data.data);
       }
@@ -48,10 +48,10 @@ export const AdminProvider = ({ children }) => {
   // Récupérer les statistiques globales
   const fetchStats = async () => {
     try {
-      console.log('Fetching admin stats...');
+      // Log supprimé pour la production
       const res = await API.get('/admin/stats');
       if (res.data.success) {
-        console.log('Admin stats fetched:', res.data.data);
+        // Log supprimé pour la production
         setStats(res.data.data);
       }
       return res.data.data;

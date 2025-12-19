@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+  namespace: default
+data:
+  init.sql: |
+    -- Création de la base de données si elle n'existe pas
+    CREATE DATABASE IF NOT EXISTS cdpi_network CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+    USE cdpi_network;
+
+    -- Suppression des tables existantes (pour un démarrage propre)
+    DROP TABLE IF EXISTS refresh_tokens;
+    DROP TABLE IF EXISTS password_resets;
+    DROP TABLE IF EXISTS users;
+
+    -- Table des utilisateurs
+    CREATE TABLE users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        first_name VARCHAR(100) NOT NULL,
+        last_name VARCHAR(100) NOT NULL,
+        city VARCHAR(100) NOT NULL,
+        promo VARCHAR(50) NOT NULL,
+        avatar VARCHAR(255) DEFAULT NULL,
+        role ENUM('user', 'admin') DEFAULT 'user',
+        is_validated BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_email (email),
+        INDEX idx_role (role),
+        INDEX idx_is_validated (is_validated)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    -- Table des tokens de rafraîchissement
+    CREATE TABLE refresh_tokens (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        token VARCHAR(500) NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        INDEX idx_token (token),
+        INDEX idx_user_id (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

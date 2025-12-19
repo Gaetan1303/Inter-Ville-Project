@@ -33,7 +33,7 @@ export const SocketProvider = ({ children }) => {
 
       // Événements de connexion
       newSocket.on('connect', () => {
-        console.log('Socket connecté:', newSocket.id);
+        // Log supprimé pour la production
         setIsConnected(true);
         
         // Envoyer les informations utilisateur au serveur
@@ -45,7 +45,7 @@ export const SocketProvider = ({ children }) => {
       });
 
       newSocket.on('disconnect', () => {
-        console.log('Socket déconnecté');
+        // Log supprimé pour la production
         setIsConnected(false);
         setOnlineUsers([]);
       });

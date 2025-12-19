@@ -1,26 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useChallenges } from '../contexts/ChallengeContext';
-import { useParticipation } from '../contexts/ParticipationContext';
+import { useToastContext } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 import '../styles/Admin.css';
 
 export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { challenges, deleteChallenge } = useChallenges();
-  const { participations, getUserParticipations, deleteParticipation, loading: participationLoading } = useParticipation();
+  const { showToast } = useToastContext();
+  const [badges, setBadges] = useState([]);
   const userChallenges = challenges.filter((c) => c.created_by === user?.id);
-  console.log('User Challenges:', userChallenges);
+  // Log supprimé pour la production
 
   // Fonction pour supprimer un challenge avec confirmation
   const handleDelete = async (id, title) => {
     if (window.confirm(`Etes-vous sur de vouloir supprimer le challenge "${title}" ?`)) {
       try {
         await deleteChallenge(id);
-        alert('Challenge supprime avec succes !');
+        showToast('Challenge supprimé avec succès !', 'success');
       } catch (err) {
-        alert('Erreur lors de la suppression du challenge.');
+        showToast('Erreur lors de la suppression du challenge.', 'error');
       }
     }
   };
@@ -48,23 +50,28 @@ export default function Profile() {
     }
   }, [user, navigate]);
 
-  // Charger les participations de l'utilisateur
   useEffect(() => {
-    const loadParticipations = async () => {
-      if (user?.id) {
-        try {
-          await getUserParticipations(user.id);
-        } catch (err) {
-          console.error('Erreur lors du chargement des participations:', err);
-        }
-      }
-    };
-    loadParticipations();
-  }, [user?.id]);
+    // Suppression de la récupération des badges pour les utilisateurs
+    setBadges([]);
+  }, [user]);
 
-  if (!user) {
-    return null;
-  }
+  useEffect(() => {
+    const interceptor = axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          logout();
+          navigate('/login');
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axiosInstance.interceptors.response.eject(interceptor);
+    };
+  }, [logout, navigate]);
+
 
   return (
     <div className="admin-container">
@@ -140,7 +147,6 @@ export default function Profile() {
                         Edit
                       </button>
                       <button
-                        
                         className="action-btn delete-btn"
                         onClick={() => handleDelete(challenge.id, challenge.title)}
                         title="Supprimer"
@@ -158,67 +164,61 @@ export default function Profile() {
         )}
       </section>
 
-      {/* Section Mes Participations */}
-      <section className="challenges-section">
-        <h2>Mes participations</h2>
-        {participationLoading && <p className="muted">Chargement des participations...</p>}
-        {!participationLoading && participations.length === 0 && (
-          <p className="empty-message">Aucune participation pour le moment.</p>
+      {/* Section Mes Badges */}
+      <section className="badges-section">
+        <h2>Mes Badges</h2>
+        {badges.length > 0 ? (
+          <ul>
+            {badges.map((badge, idx) => (
+              <li key={idx} className="badge-pill">{badge}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="muted">Aucun badge pour le moment.</p>
         )}
-        {!participationLoading && participations.length > 0 && (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Challenge</th>
-                <th>Catégorie</th>
-                <th>Difficulté</th>
-                <th>Statut</th>
-                <th>Date d'inscription</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {participations.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.challenge_id}</td>
-                  <td>{p.challenge?.title || '—'}</td>
-                  <td>{p.challenge?.category || '—'}</td>
-                  <td>{p.challenge?.difficulty || '—'}</td>
-                  <td>
-                    <span 
-                      className={`status-badge status-${p.challenge?.status || 'unknown'}`}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: '12px',
-                        fontSize: '0.85em',
-                        fontWeight: '600',
-                        backgroundColor: 
-                          p.challenge?.status === 'active' ? '#10b981' :
-                          p.challenge?.status === 'completed' ? '#6366f1' :
-                          p.challenge?.status === 'pending' ? '#f59e0b' :
-                          '#64748b',
-                        color: '#fff'
-                      }}
-                    >
-                      {p.challenge?.status || '—'}
-                    </span>
-                  </td>
-                  <td>{p.createdAt ? new Date(p.createdAt).toLocaleDateString('fr-FR') : '—'}</td>
-                  <td>
-                    <button
-                      className="action-btn delete-btn"
-                      onClick={() => handleDeleteParticipation(p.id, p.challenge?.title || 'ce challenge')}
-                      title="Se desister"
-                    >
-                      Se desister
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      </section>
+
+      {/* Section Avatar */}
+      <section className="avatar-section">
+        <h2>Mon Avatar</h2>
+        <div className="avatar-container">
+          <img
+            src={user.avatar || '/default-avatar.png'}
+            alt="Avatar utilisateur"
+            className="avatar-image"
+          />
+          <input
+            type="file"
+            accept="image/*"
+            id="avatar-upload"
+            style={{ display: 'none' }}
+            onChange={async (e) => {
+              const file = e.target.files[0];
+              if (file) {
+                const formData = new FormData();
+                formData.append('avatar', file);
+                try {
+                  const res = await axiosInstance.post('/users/avatar', formData, {
+                    headers: {
+                      'Content-Type': 'multipart/form-data',
+                    },
+                  });
+                  showToast('Avatar mis à jour avec succès !', 'success');
+                  // Mettre à jour l'avatar de l'utilisateur
+                  user.avatar = res.data.avatar;
+                } catch (err) {
+                  showToast('Erreur lors de la mise à jour de l\'avatar.', 'error');
+                }
+              }
+            }}
+          />
+          <button
+            className="action-btn upload-btn"
+            onClick={() => document.getElementById('avatar-upload').click()}
+          >
+            Upload Avatar
+          </button>
+        </div>
       </section>
     </div>
   );

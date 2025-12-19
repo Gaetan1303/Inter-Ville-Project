@@ -69,9 +69,7 @@ const generate_admin_token = (admin_id) => {
   );
 };
 
-// Augmenter la durée de vie des tokens pour les tests
-const isTestEnvironment = process.env.NODE_ENV === 'test';
-const jwtExpire = isTestEnvironment ? '30d' : process.env.JWT_EXPIRE || '1h';
+const jwtExpire = process.env.JWT_EXPIRE || '1h';
 
 // Ajout de journaux pour vérifier la valeur de JWT_SECRET
 // console.log supprimé pour sécurité

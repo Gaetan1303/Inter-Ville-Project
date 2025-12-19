@@ -1,4 +1,3 @@
-
 const express = require("express");
 const rateLimit = require("express-rate-limit");
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
@@ -19,13 +18,17 @@ const app = express();
 // Rate limiting global (100 requêtes/15min par IP)
 const limiter = rateLimit({
   windowMs: process.env.NODE_ENV === 'test' ? 2000 : 15 * 60 * 1000, // 2 secondes en test, 15 min sinon
-  max: 100, // Limite chaque IP à 100 requêtes par fenêtre
+  max: process.env.NODE_ENV === 'development' ? 1000 : 100, // 1000 en dev, 100 en prod
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => {
     if (process.env.NODE_ENV === 'test') {
       // Désactive le rate-limit sur /api-docs et /auth/me en test
       return req.path.startsWith('/api-docs') || req.path === '/auth/me';
+    }
+    // Désactive le rate-limit en développement local
+    if (process.env.NODE_ENV === 'development') {
+      return true;
     }
     return false;
   }
@@ -50,20 +53,30 @@ if (process.env.NODE_ENV === "production") {
       credentials: true,
     })
   );
-  console.log("[CORS] Mode production : origine autorisée =", process.env.FRONTEND_URL);
 } else {
   app.use(
     cors({
       origin: [
         process.env.FRONTEND_URL || "http://localhost:5173",
         "http://localhost:3000",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:3000" // Ajout pour Minikube
       ],
       credentials: true,
     })
   );
-  console.log("[CORS] Mode développement : origines autorisées multiples");
 }
+
+// Gérer les requêtes pré-volées OPTIONS pour CORS
+app.options("*", cors());
+
+// Log pour vérifier que CORS est actif
+console.log("CORS configuré pour :", process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : [
+  process.env.FRONTEND_URL || "http://localhost:5173",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:3000"
+]);
 
 // Redirection HTTP vers le frontend en production (placeholder)
 if (process.env.NODE_ENV === "production") {

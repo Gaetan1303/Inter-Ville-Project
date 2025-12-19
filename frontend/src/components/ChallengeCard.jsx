@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export default function ChallengeCard({ defi }) {
-  console.log('Rendering ChallengeCard for:', defi);
+  // Log supprimé pour la production
   return (
     <article className="card">
       <Link to={`/challenge/${defi.id}`} className="card-link">

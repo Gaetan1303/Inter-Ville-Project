@@ -13,6 +13,8 @@ exports.uploadChallengeImage = (req, res) => {
   }
 };
 const Challenge = require('../models/Challenge');
+const Comment = require('../models/Comment');
+const Participation = require('../models/Participation');
 
 // Liste des challenges avec filtres
 exports.getChallenges = async (req, res) => {
@@ -55,6 +57,12 @@ exports.updateChallenge = async (req, res) => {
     if (!challenge) {
       return res.status(404).json({ success: false, message: 'Challenge introuvable' });
     }
+    
+    // Vérifier que l'utilisateur est autorisé (créateur ou admin)
+    if (req.user && challenge.created_by !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Accès refusé' });
+    }
+    
     await challenge.update(req.body);
     res.status(200).json({ success: true, data: challenge });
   } catch (error) {
@@ -73,5 +81,44 @@ exports.deleteChallenge = async (req, res) => {
     res.status(200).json({ success: true, message: 'Challenge deleted successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: process.env.NODE_ENV === 'production' ? 'Erreur serveur' : error.message });
+  }
+};
+
+// Détail d'un challenge avec commentaires et participations
+exports.getChallengeDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Récupérer le challenge avec ses commentaires et participations
+    const challenge = await Challenge.findByPk(id, {
+      include: [
+        {
+          model: Comment,
+          as: 'comments',
+        },
+        {
+          model: Participation,
+          as: 'participations',
+        },
+      ],
+    });
+
+    if (!challenge) {
+      return res.status(404).json({
+        success: false,
+        message: 'Challenge non trouvé',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: challenge,
+    });
+  } catch (error) {
+    console.error('Erreur lors de la récupération du détail du challenge :', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur interne du serveur',
+    });
   }
 };

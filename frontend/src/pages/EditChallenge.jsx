@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useChallenges } from '../contexts/ChallengeContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToastContext } from '../contexts/ToastContext';
 
 export default function EditChallenge() {
   const { id } = useParams();
@@ -18,6 +19,7 @@ export default function EditChallenge() {
 
   const { fetchChallengeById, updateChallenge,setChallenges,fetchChallenges } = useChallenges();
   const { user } = useAuth();
+  const { showToast } = useToastContext();
   const navigate = useNavigate();
 
   // Charger le challenge existant
@@ -61,7 +63,10 @@ export default function EditChallenge() {
   // Gestion de la soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return alert('Connecte-toi pour modifier un challenge');
+    if (!user) {
+      showToast('Connecte-toi pour modifier un challenge', 'warning');
+      return navigate('/login');
+    }
     setSaving(true);
     setError('');
     setSuccess('');

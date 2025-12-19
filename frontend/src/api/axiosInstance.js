@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Use dev proxy via Vite: frontend calls /api -> proxied to backend
-const baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Use direct backend URL for Kubernetes/port-forward setup
+const baseURL = 'http://localhost:5000';
 
 const API = axios.create({
   baseURL,
@@ -29,6 +29,18 @@ API.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+// Interceptor to handle 401 errors globally
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('accessToken');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
 );
 
 export default API;
